@@ -6,5 +6,22 @@ public class Instructor extends User{
         token="instructor";
     }
 
-    private ArrayList<Lesson> lessonList = new ArrayList<>();
+    private final ArrayList<Lesson> lessonList = new ArrayList<>();
+
+    public void addLesson(String lessonName){
+        lessonList.add(new Lesson(lessonName));
+    }
+
+    public void printLessons(){
+        if (lessonList.size()!=0){
+            System.out.println("Here are the lessons you are giving:");
+            for (Lesson lesson : lessonList) {
+                System.out.println(lesson.getName());
+            }
+        }
+        else{
+            System.out.println("You currently have no lessons.");
+        }
+
+    }
 }

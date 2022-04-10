@@ -1,14 +1,18 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
-
 public class Lesson {
-    private String name;
-    private ArrayList <LocalDate> examDates = new ArrayList<>();
+    public Lesson(String name) {
+        this.name = name;
+    }
 
+    private final String name;
+    private final ArrayList <LocalDate> examDates = new ArrayList<>();
 
-
+    public String getName() {
+        return name;
+    }
 
     public void showExamDates(){
+        //TODO:Show dates
     }
 }
