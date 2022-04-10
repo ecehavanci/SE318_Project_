@@ -1,9 +1,30 @@
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("~Welcome to Exam Management System~");
         Database database = new Database();
+        User user = showMainMenu(database);
+
+
+        System.out.println("Welcome " + user.getName());
+
+        if (Objects.equals(user.getToken(), "student")){
+            System.out.println("Here are your lessons:");
+            //TODO: Show lessons
+            //TODO: Add logging out when structure is formed
+        }
+
+        else if (Objects.equals(user.getToken(), "instructor")){
+            System.out.println("Here are the lessons you are giving:");
+            //TODO: Show lessons
+            //TODO: Add logging out when structure is formed
+        }
+
+    }
+
+    public static User showMainMenu(Database db){
         User user = null;
         while (true) {
             boolean isSignedIn = false;
@@ -30,8 +51,8 @@ public class Main {
                     System.out.println("Surname: ");
                     String surname = scan.nextLine();
                     switch (signingUpChoice) {
-                        case 1 -> database.registerInstructor(name, surname, ID, password);
-                        case 2 -> database.registerStudent(name, surname, ID, password);
+                        case 1 -> db.registerInstructor(name, surname, ID, password);
+                        case 2 -> db.registerStudent(name, surname, ID, password);
                     }
                 }
                 case 2 -> {
@@ -41,7 +62,7 @@ public class Main {
                     System.out.println("Password: ");
                     String password = scan.nextLine();
                     try {
-                        user = database.logIn(ID,password);
+                        user = db.logIn(ID,password);
                         isSignedIn=true;
                     }
                     catch (WrongEmailException WEex){
@@ -56,13 +77,11 @@ public class Main {
                 }
             }
             if (isSignedIn){
-                break;
+                return user;
             }
         }
-
-        System.out.println("Welcome " + user.getName());
-
     }
+
 
 
 }
