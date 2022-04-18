@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -7,22 +9,21 @@ public class Main {
         System.out.println("~Welcome to Exam Management System~");
         Database database = new Database();
 
-        while (true ){
+        while (true) {
             User user = showMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");
 
-            if (Objects.equals(user.getToken(), "student")){
+            if (Objects.equals(user.getToken(), "student")) {
                 System.out.println("Here are your lessons:");
                 //TODO: Show lessons
                 //TODO: Add logging out when structure is formed
-            }
-
-            else if (Objects.equals(user.getToken(), "instructor")){
+            } else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;
-                while (true){
-                    boolean willLogOut=false;
+                while (true) {
+                    boolean willLogOut = false;
                     //TODO: Show lessons
+                    System.out.println();
                     instructor.printLessons();
                     //TODO: Add logging out when structure is formed
 
@@ -35,30 +36,41 @@ public class Main {
                     System.out.println("4) Grade or approve exams");
                     System.out.println("5) Log out");
 
-                    int insChoice=scan.nextInt();
+                    int insChoice = scan.nextInt();
+                    scan.nextLine();
 
-                    switch (insChoice){
-                        case 1 ->{
+                    switch (insChoice) {
+                        case 1 -> {
                             System.out.println("Name of the lesson: ");
-                            String lessonName=scan.nextLine();
+                            String lessonName = scan.nextLine();
                             instructor.addLesson(lessonName);
                         }
-                        case 2 ->{
+                        case 2 -> {
                             //TODO: See and set details of a lesson
+                            instructor.lessonList.get(0).examList.get(0).printQuestions();
+                            System.out.println("\n\n\n\n");
+                            instructor.lessonList.get(0).examList.get(0).printQuestionsWithAnswers();
+
                         }
-                        case 3 ->{
+                        case 3 -> {
                             //TODO: Build up an exam
+                            try {
+                                BuildUpExam(instructor);
+                            } catch (LessonNotFoundException LNFE) {
+                                System.out.println("Lesson not found");
+                            }
+
                         }
-                        case 4 ->{
+                        case 4 -> {
                             //TODO: Grade or approve exams
                         }
-                        case 5 ->{
+                        case 5 -> {
                             System.out.println("Logging out...");
-                            willLogOut=true;
+                            willLogOut = true;
                         }
                         default -> System.out.println("Invalid choice.");
                     }
-                    if (willLogOut){
+                    if (willLogOut) {
                         break;
                     }
                 }
@@ -69,7 +81,126 @@ public class Main {
 
     }
 
-    public static User showMainMenu(Database db){
+    public static void BuildUpExam(Instructor inst) throws LessonNotFoundException {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Please enter the name of the lesson that you want to add an exam to:");
+        String lessonName = scan.nextLine();
+
+        Lesson lesson = null;
+        Exam exam = new Exam();
+
+        lesson = inst.FindLesson(lessonName);
+        boolean isDone = false;
+        boolean isCancel = false;
+        while (true) {
+
+
+            System.out.println("What kind of question would you like to add?");
+            System.out.println("1) Classical type question (open ended)");
+            System.out.println("2) Multiple choice question");
+            System.out.println("3) True/False question");
+            System.out.println("4) Done exam building");
+            System.out.println("5) Cancel exam building");
+
+
+            int examChoice = scan.nextInt();
+            scan.nextLine();
+
+            switch (examChoice) {
+                case 1 -> {
+                    System.out.println("Question: ");
+                    String questionText = scan.nextLine();
+
+                    System.out.println("Right Answer: ");
+                    String answerText = scan.nextLine();
+
+                    ClassicalAnswer ca = new ClassicalAnswer(answerText);
+                    exam.addQuestion(questionText, ca);
+
+
+                }
+                case 2 -> {
+                    System.out.println("Question: ");
+                    String questionText = scan.nextLine();
+
+                    System.out.println("How many choices are there?");
+                    int choiceCount = scan.nextInt();
+                    scan.nextLine();
+
+                    MultipleChoiceAnswer mca = new MultipleChoiceAnswer();
+
+                    List<String> choiceList = new ArrayList<>();
+                    for (int i = 0; i < choiceCount; i++) {
+                        System.out.println("Enter choice " + (char) (65 + i) + ":");
+                        String choice = scan.nextLine();
+                        choiceList.add(choice);
+                    }
+
+                    System.out.println("Which choice is right?");
+                    char choiceCode = scan.nextLine().charAt(0);
+
+                    for (int i = 0; i < choiceCount; i++) {
+                        mca.choices.add(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
+                    }
+
+                    exam.addQuestion(questionText, mca);
+
+
+                }
+                case 3 -> {
+                    System.out.println("Question: ");
+                    //scan.nextLine();
+                    String questionText = scan.nextLine();
+
+                    System.out.println("Right Answer: ");
+                    //scan.nextLine();
+                    char answer = scan.nextLine().charAt(0);
+
+                    TrueFalseAnswer tfa = new TrueFalseAnswer(answer);
+
+                    exam.addQuestion(questionText, tfa);
+
+
+                }
+                case 4 -> isDone = true;
+                case 5 -> isCancel = true;
+                default -> System.out.println("Please enter a valid choice");
+            }
+            if (isDone || isCancel) {
+                break;
+            }
+
+        }
+        if (isDone) {
+            System.out.print("Please enter a date: ");
+            while(true){
+                String date = scan.nextLine();
+                String[] splitDate = date.contains("/") ? date.split("/") : date.contains(":") ? date.split(":") : null;
+                if (splitDate==null){
+                    System.out.println("Please enter a valid date");
+                }
+                else{
+                    int [] dateParts = new int[3];
+                    for (int i = 0; i < 3; i++) {
+                        dateParts[i] = Integer.parseInt(splitDate[i]);
+                    }
+                    exam.setDate(dateParts);
+                    break;
+                }
+            }
+
+            try {
+                lesson.addExam(exam);
+                System.out.println("Exam is successfully added");
+            } catch (Exception e) {
+                System.out.println("An error occurred while adding the exam, please try again later.");
+            }
+        }
+
+
+    }
+
+    public static User showMainMenu(Database db) {
         User user = null;
         while (true) {
             boolean isSignedIn = false;
@@ -91,7 +222,7 @@ public class Main {
 
                     int signingUpChoice = scan.nextInt();
 
-                    if (signingUpChoice==3){
+                    if (signingUpChoice == 3) {
                         break;
                     }
 
@@ -117,16 +248,13 @@ public class Main {
                     System.out.println("Password: ");
                     String password = scan.nextLine();
                     try {
-                        user = db.logIn(ID,password);
-                        isSignedIn=true;
-                    }
-                    catch (WrongEmailException WEex){
+                        user = db.logIn(ID, password);
+                        isSignedIn = true;
+                    } catch (WrongEmailException WEex) {
                         System.out.println("Email Not Found");
-                    }
-                    catch (WrongPasswordException WPex){
+                    } catch (WrongPasswordException WPex) {
                         System.out.println("Wrong Password");
-                    }
-                    catch (NullPointerException nullEx){
+                    } catch (NullPointerException nullEx) {
                         System.out.println("Please try again");
                     }
                 }
@@ -136,12 +264,13 @@ public class Main {
                 }
                 default -> System.out.println("Invalid choice.");
             }
-            if (isSignedIn){
+            if (isSignedIn) {
                 return user;
             }
         }
     }
 
 
-
 }
+
+

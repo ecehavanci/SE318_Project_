@@ -1,4 +1,4 @@
-public abstract class User{
+public abstract class User {
     public User(String name, String surname, int schoolID, String password) {
         this.name = name;
         this.surname = surname;
@@ -7,10 +7,15 @@ public abstract class User{
     }
 
     protected String token;
-    private String name;
-    private String surname;
-    private int schoolID;
+    private final String name;
+    private final String surname;
+    private final int schoolID;
     private String password;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 
     public String getToken() {
         return token;
