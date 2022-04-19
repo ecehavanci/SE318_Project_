@@ -1,11 +1,10 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Answer {
     protected boolean evaluatedDirectly;
+
     public abstract void print();
+
     public abstract void printResult();
 }
 
@@ -13,18 +12,18 @@ class ClassicalAnswer extends Answer {
     private String text;
 
     ClassicalAnswer(String answerText) {
-        text=answerText;
+        text = answerText;
         evaluatedDirectly = false;
     }
 
     @Override
     public void print() {
-        System.out.println();
+        //Print Nothing
     }
 
     @Override
     public void printResult() {
-        System.out.println("No answer available for classical question");
+        System.out.println(Objects.requireNonNullElse(text, "No answer available for question"));
     }
 }
 
@@ -38,14 +37,14 @@ class MultipleChoiceAnswer extends Answer {
 
     @Override
     public void print() {
-        for (Choice c : choices) {
-            System.out.println(c.text);
+        for (int i = 0; i < choices.size(); i++) {
+            System.out.println((char) 65 + i + ") " + choices.get(i).text);
         }
     }
 
     public void printResult() {
         for (Choice c : choices) {
-            if (c.isRight) System.out.println(c.text);
+            if (c.isRight) System.out.println("Right Choice: " + c.text);
         }
     }
 }
@@ -71,7 +70,7 @@ class TrueFalseAnswer extends Answer {
 
     @Override
     public void print() {
-        System.out.println("  T  F");
+        System.out.print("True (T)\nFalse (F)");
     }
 
     @Override

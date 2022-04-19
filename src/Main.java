@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -111,8 +108,15 @@ public class Main {
                     System.out.println("Question: ");
                     String questionText = scan.nextLine();
 
-                    System.out.println("Right Answer: ");
-                    String answerText = scan.nextLine();
+                    System.out.println("Would you like to enter an answer to this classical question to help you grading? Yes/No ");
+                    String answerChoice = scan.nextLine();
+                    answerChoice=answerChoice.toUpperCase(Locale.ROOT);
+
+                    String answerText = null;
+                    if (answerChoice.equals("YES")){
+                        System.out.println("Please enter the answer");
+                        answerText = scan.nextLine();
+                    }
 
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
                     exam.addQuestion(questionText, ca);
@@ -175,7 +179,7 @@ public class Main {
             System.out.print("Please enter a date: ");
             while(true){
                 String date = scan.nextLine();
-                String[] splitDate = date.contains("/") ? date.split("/") : date.contains(":") ? date.split(":") : null;
+                String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
                 if (splitDate==null){
                     System.out.println("Please enter a valid date");
                 }
@@ -215,7 +219,7 @@ public class Main {
 
             switch (signingChoice) {
                 case 1 -> {
-                    System.out.println("What do you want to log in as?");
+                    System.out.println("What do you want to sign up as?");
                     System.out.println("1) Instructor");
                     System.out.println("2) Student");
                     System.out.println("3) Cancel registration");

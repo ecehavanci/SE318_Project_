@@ -9,10 +9,13 @@ public class QuestionAndAnswer {
 
     public void printQuestion(){
         System.out.println(question);
+        answer.print();
+        System.out.println();
     }
 
     public void printQuestionAndAnswer(){
         printQuestion();
-        answer.print();
+        answer.printResult();
+        System.out.println();
     }
 }
