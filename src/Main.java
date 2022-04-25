@@ -7,7 +7,7 @@ public class Main {
         Database database = new Database();
 
         while (true) {
-            User user = showMainMenu(database);
+            User user = ShowMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");
 
@@ -15,17 +15,31 @@ public class Main {
                 System.out.println("Here are your lessons:");
                 //TODO: Show lessons
                 //TODO: Add logging out when structure is formed
-            } else if (Objects.equals(user.getToken(), "instructor")) {
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+            else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;
                 while (true) {
                     boolean willLogOut = false;
-                    //TODO: Show lessons
+                    //Instructors see their lessons when they first logged in
                     System.out.println();
                     instructor.printLessons();
                     //TODO: Add logging out when structure is formed
 
                     System.out.println();
 
+                    //Instructors have 5 options as follows:
                     System.out.println("Please choose what you would like to do");
                     System.out.println("1) Add lesson");
                     System.out.println("2) See and set details of a lesson");
@@ -33,25 +47,32 @@ public class Main {
                     System.out.println("4) Grade or approve exams");
                     System.out.println("5) Log out");
 
+                    //They choose what they want to do
                     int insChoice = scan.nextInt();
                     scan.nextLine();
 
                     switch (insChoice) {
                         case 1 -> {
-                            System.out.println("Name of the lesson: ");
+                            System.out.print("Name of the lesson: ");
                             String lessonName = scan.nextLine();
+
+                            //Instructor has a lesson list, he/she creates and ads a lesson to his/her lesson list with given name
                             instructor.addLesson(lessonName);
                         }
                         case 2 -> {
-                            //TODO: See and set details of a lesson
-                            instructor.lessonList.get(0).examList.get(0).printQuestions();
-                            System.out.println("\n\n\n\n");
-                            instructor.lessonList.get(0).examList.get(0).printQuestionsWithAnswers();
+                            System.out.print("Name of the lesson: ");
+                            String lessonName = scan.nextLine();
+                            try {
+                                //This action shows all the lessons, instructor gives and then enables instructor to change their details
+                                instructor.ShowLessonDetails(lessonName);
+                            } catch (LessonNotFoundException LNFE) {
+                                System.out.println("Lesson not found");
+                            }
 
                         }
                         case 3 -> {
-                            //TODO: Build up an exam
                             try {
+                                //This action enables instructor to
                                 BuildUpExam(instructor);
                             } catch (LessonNotFoundException LNFE) {
                                 System.out.println("Lesson not found");
@@ -75,6 +96,10 @@ public class Main {
             }
         }
 
+
+    }
+
+    public static void SetLessonDetails(){
 
     }
 
@@ -119,7 +144,7 @@ public class Main {
                     }
 
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
-                    exam.addQuestion(questionText, ca);
+                    exam.AddQuestion(questionText, ca);
 
 
                 }
@@ -147,7 +172,7 @@ public class Main {
                         mca.choices.add(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
                     }
 
-                    exam.addQuestion(questionText, mca);
+                    exam.AddQuestion(questionText, mca);
 
 
                 }
@@ -162,7 +187,7 @@ public class Main {
 
                     TrueFalseAnswer tfa = new TrueFalseAnswer(answer);
 
-                    exam.addQuestion(questionText, tfa);
+                    exam.AddQuestion(questionText, tfa);
 
 
                 }
@@ -177,24 +202,14 @@ public class Main {
         }
         if (isDone) {
             System.out.print("Please enter a date: ");
-            while(true){
-                String date = scan.nextLine();
-                String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
-                if (splitDate==null){
-                    System.out.println("Please enter a valid date");
-                }
-                else{
-                    int [] dateParts = new int[3];
-                    for (int i = 0; i < 3; i++) {
-                        dateParts[i] = Integer.parseInt(splitDate[i]);
-                    }
-                    exam.setDate(dateParts);
-                    break;
-                }
-            }
+            SetDate(exam);
+
+            System.out.print("Please enter the type of the exam: ");
+            String examType = scan.nextLine();
+            exam.EditType(examType);
 
             try {
-                lesson.addExam(exam);
+                lesson.AddExam(exam);
                 System.out.println("Exam is successfully added");
             } catch (Exception e) {
                 System.out.println("An error occurred while adding the exam, please try again later.");
@@ -204,7 +219,7 @@ public class Main {
 
     }
 
-    public static User showMainMenu(Database db) {
+    public static User ShowMainMenu(Database db) {
         User user = null;
         while (true) {
             boolean isSignedIn = false;
@@ -270,6 +285,25 @@ public class Main {
             }
             if (isSignedIn) {
                 return user;
+            }
+        }
+    }
+
+    public static void SetDate(Exam exam){
+        Scanner scan = new Scanner(System.in);
+        while(true){
+            String date = scan.nextLine();
+            String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
+            if (splitDate==null){
+                System.out.println("Please enter a valid date");
+            }
+            else{
+                int [] dateParts = new int[3];
+                for (int i = 0; i < 3; i++) {
+                    dateParts[i] = Integer.parseInt(splitDate[i]);
+                }
+                exam.SetDate(dateParts);
+                break;
             }
         }
     }
