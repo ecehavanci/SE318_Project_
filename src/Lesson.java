@@ -44,6 +44,7 @@ public class Lesson {
 
     public void Print(){
         System.out.println("INFO FOR LESSON " + name.toUpperCase(Locale.ROOT));
+        System.out.println("Instructor: " + instructor.getName());
         ShowExamDetails();
     }
 
