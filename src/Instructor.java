@@ -9,10 +9,12 @@ public class Instructor extends User {
         token = "instructor";
     }
 
-    /*private*/ final ArrayList<Lesson> lessonList = new ArrayList<>();
+    private final ArrayList<Lesson> lessonList = new ArrayList<>();
 
-    public void addLesson(String lessonName) {
-        lessonList.add(new Lesson(lessonName));
+    public Lesson addAndReturnLesson(String lessonName, Instructor instructor) {
+        Lesson newLesson = new Lesson(lessonName, instructor);
+        lessonList.add(newLesson);
+        return newLesson;
     }
 
     public Lesson FindLesson(String lessonName) throws LessonNotFoundException{
@@ -52,7 +54,7 @@ public class Instructor extends User {
         System.out.println("Please choose what would you like to do: ");
         System.out.println("1) Edit the name of the lesson");
         System.out.println("2) Edit an exam");
-        System.out.println("any other key) Cancel");
+        System.out.println("Press any other key to cancel");
         int detailChoice = scan.nextInt();
         scan.nextLine();
         switch (detailChoice){
@@ -69,7 +71,7 @@ public class Instructor extends User {
                     System.out.println("What would you like to edit?");
                     System.out.println("1) Exam type");
                     System.out.println("2) Exam date");
-                    System.out.println("any other key) Cancel");
+                    System.out.println("Press any other key to cancel");
 
                     int editChoice = scan.nextInt();
                     scan.nextLine();

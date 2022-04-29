@@ -2,13 +2,14 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Lesson {
-    public Lesson(String name) {
+    private Instructor instructor;
+    private String name;
+    public Lesson(String name, Instructor instructor) {
         this.name = name;
+        this.instructor=instructor;
     }
 
-    private String name;
-
-    /*private*/ final ArrayList<Exam> examList = new ArrayList<>();
+    private final ArrayList<Exam> examList = new ArrayList<>();
 
     public void AddExam(Exam exam){
         examList.add(exam);
@@ -45,6 +46,7 @@ public class Lesson {
         System.out.println("INFO FOR LESSON " + name.toUpperCase(Locale.ROOT));
         ShowExamDetails();
     }
+
 
 
 }

@@ -7,6 +7,7 @@ public class Main {
         Database database = new Database();
 
         while (true) {
+
             User user = ShowMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");
@@ -57,7 +58,8 @@ public class Main {
                             String lessonName = scan.nextLine();
 
                             //Instructor has a lesson list, he/she creates and ads a lesson to his/her lesson list with given name
-                            instructor.addLesson(lessonName);
+                            Lesson lesson = instructor.addAndReturnLesson(lessonName, instructor);
+                            database.addLesson(lesson);
                         }
                         case 2 -> {
                             System.out.print("Name of the lesson: ");
@@ -72,7 +74,7 @@ public class Main {
                         }
                         case 3 -> {
                             try {
-                                //This action enables instructor to
+                                //This action enables instructor to build an exam with desired questions in it
                                 BuildUpExam(instructor);
                             } catch (LessonNotFoundException LNFE) {
                                 System.out.println("Lesson not found");

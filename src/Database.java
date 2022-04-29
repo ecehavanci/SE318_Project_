@@ -43,6 +43,26 @@ public class Database {
         return null;
     }
 
+    public void addLesson(Lesson lesson){
+        lessonList.add(lesson);
+    }
+
+    public Lesson FindLesson(String lessonName) throws LessonNotFoundException{
+        for (Lesson lesson : lessonList){
+            if (Objects.equals(lesson.getName(), lessonName)){
+                return lesson;
+            }
+        }
+        throw new LessonNotFoundException();
+    }
+
+    public void showLessons(){
+        System.out.println("Lessons in database");
+        for (Lesson lesson : lessonList){
+            System.out.println(lesson.getName());
+        }
+    }
+
 }
 
 class WrongEmailException extends Exception {
