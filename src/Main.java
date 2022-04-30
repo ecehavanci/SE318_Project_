@@ -9,6 +9,7 @@ public class Main {
 
         while (true) {
 
+
             User user = ShowMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");
@@ -33,7 +34,13 @@ public class Main {
 
                     switch (insChoice) {
                         case 1 -> {
-                            enrollUnroll(database, student);
+                            try{
+                                enrollUnroll(database, student);
+                            }
+                            catch (WrongChoiceException WCE){
+                                System.out.println("Unexpected output");
+                            }
+
                         }
                         case 2 -> {
                             //list all enrolled lessons in std class
@@ -298,6 +305,10 @@ public class Main {
                     }
                 }
                 case 2 -> {
+                    if (db.userList.size()==0){
+                        System.out.println("No account created for Exam Management System yet. Please create an account for logging in.");
+                        continue;
+                    }
                     System.out.println("School ID: ");
                     int ID = scan.nextInt();
                     scan.nextLine();
@@ -344,8 +355,10 @@ public class Main {
         }
     }
 
-    public static void enrollUnroll(Database database, Student student) throws WrongChoiceException, LessonNotFoundException {
+    public static void enrollUnroll(Database database, Student student) throws WrongChoiceException{
         Scanner scan = new Scanner(System.in);
+
+        //Students can enroll and unenroll to a lesson using "enroll" or "unenroll" input
         System.out.println("Do you want to enroll or uneroll in lessons?");
         String enrollChoice = scan.nextLine();
 
@@ -353,20 +366,29 @@ public class Main {
             System.out.println("You can enroll in these lessons");
             database.showLessons();//list all lessons in
 
-            System.out.println("Please choose one of the lessons and write it's name to enroll");
+            System.out.println("Please choose one of the lessons and write its name to enroll");
             String choosenLesson = scan.nextLine();
-            Lesson foundedLesson = database.FindLesson(choosenLesson);
-            student.enrollLesson(foundedLesson);
-
+            try{
+                Lesson foundLesson = database.FindLesson(choosenLesson);
+                student.enrollLesson(foundLesson);
+            }
+            catch (LessonNotFoundException LNFE){
+                System.out.println("Lesson not found");
+            }
         } else if (enrollChoice.equals("unenroll")) { // unenroll according to name in list
             System.out.println("You can unenroll from your lessons");
             student.printLessons();
             String choosenLesson = scan.nextLine();
-            Lesson foundedLesson = database.FindLesson(choosenLesson);
-            student.unenrollLesson(foundedLesson);
+            try {
+                Lesson foundLesson = database.FindLesson(choosenLesson);
+                student.unenrollLesson(foundLesson);
+            }
+            catch (LessonNotFoundException LNFE){
+                System.out.println("Lesson not found");
+            }
         } else
+            //If an input is given other than enroll or unenroll, system throws an error
             throw new WrongChoiceException();
-
 
     }
 
