@@ -199,7 +199,7 @@ public class Main {
 
                     for (int i = 0; i < choiceCount; i++) {
                         //Choices are added one by one with their status (if they are right or wrong answer)
-                        mca.choices.add(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
+                        mca.addChoice(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
                     }
 
                     //Question is added along with answer

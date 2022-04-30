@@ -44,7 +44,7 @@ public class Lesson {
     }
 
 
-    //This function is for printing Lesson with info of it (its name, instrutor's name etc.)
+    //This function is for printing Lesson with info of it (its name, instrutor's name details -exam list-)
     public void Print() {
         System.out.println("INFO FOR LESSON " + name.toUpperCase(Locale.ROOT));
         System.out.println("Instructor: " + instructor.getName() + " " + instructor.getSurname());
