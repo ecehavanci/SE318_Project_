@@ -9,8 +9,6 @@ public class Instructor extends User {
         token = "instructor";
     }
 
-    private final ArrayList<Lesson> lessonList = new ArrayList<>();
-
     //This function adds and returns the lesson to instructor's local lessonList so it can be added to the lessonList in the database
     public Lesson addAndReturnLesson(String lessonName, Instructor instructor) {
         Lesson newLesson = new Lesson(lessonName, instructor);
@@ -18,27 +16,6 @@ public class Instructor extends User {
         return newLesson;
     }
 
-    //This function is used for searching a particular lesson using its name
-    public Lesson FindLesson(String lessonName) throws LessonNotFoundException {
-        for (Lesson lesson : lessonList) {
-            if (Objects.equals(lesson.getName(), lessonName)) {
-                return lesson;
-            }
-        }
-        throw new LessonNotFoundException();
-    }
-
-    //This function prints out all the lessons an instructor has
-    public void printLessons() {
-        if (lessonList.size() != 0) {
-            System.out.println("Here are the lessons you are giving:");
-            for (Lesson lesson : lessonList) {
-                System.out.println(lesson.getName());
-            }
-        } else {
-            System.out.println("You currently have no lessons.");
-        }
-    }
 
     //This function is for showing details of a lesson. It also asks if we want to change anything and if instructor wants to
     //change something SetLessonDetails function is called.

@@ -379,7 +379,7 @@ public class Main {
             student.printLessons();
             String choosenLesson = scan.nextLine();
             try {
-                Lesson foundLesson = database.FindLesson(choosenLesson);
+                Lesson foundLesson = student.FindLesson(choosenLesson);
                 student.unenrollLesson(foundLesson);
             }
             catch (LessonNotFoundException LNFE){
