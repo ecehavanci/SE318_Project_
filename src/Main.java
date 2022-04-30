@@ -17,6 +17,44 @@ public class Main {
                 //TODO: Show lessons
                 //TODO: Add logging out when structure is formed
 
+                Student student = (Student) user;
+                while (true) {
+                    boolean willLogOut = false;
+
+                    System.out.println("Please choose what you would like to do");
+                    System.out.println("1) Enroll/Unenroll in lessons");
+                    System.out.println("2) List all enrolled lesson details");
+                    System.out.println("3) See all exam informations");
+                    System.out.println("4) Log out");
+
+                    int insChoice = scan.nextInt();
+                    scan.nextLine();
+
+                    switch (insChoice) {
+                        case 1 -> {
+                            //list all lessons in db
+                            // enroll according to index in list
+                            //unenroll acccording to index in list
+                        }
+                        case 2 -> {
+                            //list all enrolled lessons in std class
+
+                        }
+                        case 3 -> {
+                            //search the enrolled lesson in lesson class
+                            //use lesson.showexamdetails()
+                        }
+                        case 4 -> {
+                            System.out.println("Logging out...");
+                            willLogOut = false;
+                        }
+
+                    }
+                    if (willLogOut) {
+                        break;
+                    }
+                }
+
 
             } else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;

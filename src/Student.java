@@ -7,4 +7,22 @@ public class Student extends User {
     }
 
     private final ArrayList<Lesson> lessonList = new ArrayList<>();
+
+    public void addToStdLessonList(Lesson lesson) {
+        lessonList.add(lesson);
+    }
+
+    public void printLessons() {
+        if (lessonList.size() != 0) {
+            System.out.println("Here are the lessons you are taking:");
+            for (Lesson lesson : lessonList) {
+                System.out.println(lesson.getName());
+            }
+        } else {
+            System.out.println("You currently have no lessons.");
+        }
+    }
+
+}
+
 }
