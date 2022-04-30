@@ -60,7 +60,8 @@ public class Main {
                 }
 
 
-            } else if (Objects.equals(user.getToken(), "instructor")) {
+            }
+            else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;
                 while (true) {
                     boolean willLogOut = false;

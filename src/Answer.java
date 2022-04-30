@@ -74,7 +74,6 @@ class Choice {
     }
 }
 
-
 class TrueFalseAnswer extends Answer {
     char answer;
 

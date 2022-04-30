@@ -16,7 +16,6 @@ public abstract class User {
         this.password = password;
     }
 
-
     public String getToken() {
         return token;
     }

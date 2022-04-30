@@ -1,4 +1,5 @@
 public class QuestionAndAnswer {
+
     //Question is only a string, but answers are more complex (thus are classes) since we want to store for example all choices for a multiple
     //choice question and the right choice together
     private final String question;

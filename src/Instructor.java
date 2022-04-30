@@ -70,7 +70,7 @@ public class Instructor extends User {
                 lesson.setName(scan.nextLine());
             }
             case 2 -> {
-                //Exam details are shown to instructor to choose what to edit
+                //Exam details are shown to the instructor to choose what to edit
                 lesson.ShowExamDetails();
 
                 //Instructor chooses which exam they want to edit from the exam list by identifying the index (Users will think

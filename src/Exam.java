@@ -54,6 +54,4 @@ public class Exam {
             QnA.printQuestionAndAnswer();
         }
     }
-
-
 }

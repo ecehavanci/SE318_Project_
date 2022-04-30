@@ -35,7 +35,8 @@ public class Database {
                 } else {
                     throw new WrongPasswordException();
                 }
-            } else {
+            }
+            else {
                 if (userList.get(userList.size() - 1) == user) {
                     throw new WrongEmailException();
                 }
