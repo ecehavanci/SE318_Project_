@@ -38,7 +38,7 @@ public class Lesson {
             Exam e = examList.get(i);
             System.out.println("EXAM " + (i + 1));
             System.out.println("Exam type: " + e.GetType());
-            System.out.println("Date: " + e.GetDate());
+            System.out.println("Date: " + e.GetLongDate());
             System.out.println();
         }
     }
