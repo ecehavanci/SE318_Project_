@@ -18,18 +18,7 @@ public class Main {
                 //TODO: Add logging out when structure is formed
 
 
-
-
-
-
-
-
-
-
-
-
-            }
-            else if (Objects.equals(user.getToken(), "instructor")) {
+            } else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;
                 while (true) {
                     boolean willLogOut = false;
@@ -94,19 +83,13 @@ public class Main {
                         break;
                     }
                 }
-
             }
         }
-
-
-    }
-
-    public static void SetLessonDetails(){
-
     }
 
     public static void BuildUpExam(Instructor inst) throws LessonNotFoundException {
         Scanner scan = new Scanner(System.in);
+        //Lessons have exams so we get here a lesson name to add that exam to that lesson
         System.out.println("Please enter the name of the lesson that you want to add an exam to:");
         String lessonName = scan.nextLine();
 
@@ -116,9 +99,9 @@ public class Main {
         lesson = inst.FindLesson(lessonName);
         boolean isDone = false;
         boolean isCancel = false;
+
+        //We sequentially add questions (along with their answers if desired) to the exam
         while (true) {
-
-
             System.out.println("What kind of question would you like to add?");
             System.out.println("1) Classical type question (open ended)");
             System.out.println("2) Multiple choice question");
@@ -126,34 +109,38 @@ public class Main {
             System.out.println("4) Done exam building");
             System.out.println("5) Cancel exam building");
 
-
             int examChoice = scan.nextInt();
             scan.nextLine();
 
             switch (examChoice) {
                 case 1 -> {
+                    //Question to be stored:
                     System.out.println("Question: ");
                     String questionText = scan.nextLine();
 
                     System.out.println("Would you like to enter an answer to this classical question to help you grading? Yes/No ");
                     String answerChoice = scan.nextLine();
-                    answerChoice=answerChoice.toUpperCase(Locale.ROOT);
+                    answerChoice = answerChoice.toUpperCase(Locale.ROOT);
 
                     String answerText = null;
-                    if (answerChoice.equals("YES")){
+                    if (answerChoice.equals("YES")) {
+                        //Answer to be stored along with the question:
                         System.out.println("Please enter the answer");
                         answerText = scan.nextLine();
                     }
 
+                    //A classical question (and its answer if desired) is created since choice 1 indicates classical question
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
                     exam.AddQuestion(questionText, ca);
 
 
                 }
                 case 2 -> {
+                    //Question to be stored:
                     System.out.println("Question: ");
                     String questionText = scan.nextLine();
 
+                    //Instructor can specify how many choices a multiple choice question has
                     System.out.println("How many choices are there?");
                     int choiceCount = scan.nextInt();
                     scan.nextLine();
@@ -161,22 +148,24 @@ public class Main {
                     MultipleChoiceAnswer mca = new MultipleChoiceAnswer();
 
                     List<String> choiceList = new ArrayList<>();
+                    //Instructor writes all choices one by one:
                     for (int i = 0; i < choiceCount; i++) {
                         System.out.println("Enter choice " + (char) (65 + i) + ":");
                         String choice = scan.nextLine();
                         choiceList.add(choice);
                     }
 
+                    //Instructor chooses the right one among all choices:
                     System.out.println("Which choice is right?");
                     char choiceCode = scan.nextLine().charAt(0);
 
                     for (int i = 0; i < choiceCount; i++) {
+                        //Choices are added one by one with their status (if they are right or wrong answer)
                         mca.choices.add(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
                     }
 
+                    //Question is added along with answer
                     exam.AddQuestion(questionText, mca);
-
-
                 }
                 case 3 -> {
                     System.out.println("Question: ");
@@ -203,9 +192,11 @@ public class Main {
 
         }
         if (isDone) {
+            //When instructor is done with adding the exam questions, he/she has to specify the date and type of the exam
             System.out.print("Please enter a date: ");
             SetDate(exam);
 
+            //The attribute could be final, quiz, midterm, etc.
             System.out.print("Please enter the type of the exam: ");
             String examType = scan.nextLine();
             exam.EditType(examType);
@@ -224,6 +215,7 @@ public class Main {
     public static User ShowMainMenu(Database db) {
         User user = null;
         while (true) {
+            //This loop continues until a user signs in
             boolean isSignedIn = false;
 
             System.out.println("Please choose what you would like to do");
@@ -236,11 +228,14 @@ public class Main {
 
             switch (signingChoice) {
                 case 1 -> {
+                    //Both users (instructor and student) sign up with their school id, password, name and surname
+                    //Both users sign in with their school id and password
                     System.out.println("What do you want to sign up as?");
                     System.out.println("1) Instructor");
                     System.out.println("2) Student");
                     System.out.println("3) Cancel registration");
 
+                    //User chooses what he/she wants to sign up as:
                     int signingUpChoice = scan.nextInt();
 
                     if (signingUpChoice == 3) {
@@ -291,16 +286,15 @@ public class Main {
         }
     }
 
-    public static void SetDate(Exam exam){
+    public static void SetDate(Exam exam) {
         Scanner scan = new Scanner(System.in);
-        while(true){
+        while (true) {
             String date = scan.nextLine();
             String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
-            if (splitDate==null){
+            if (splitDate == null) {
                 System.out.println("Please enter a valid date");
-            }
-            else{
-                int [] dateParts = new int[3];
+            } else {
+                int[] dateParts = new int[3];
                 for (int i = 0; i < 3; i++) {
                     dateParts[i] = Integer.parseInt(splitDate[i]);
                 }

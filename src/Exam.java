@@ -9,13 +9,14 @@ public class Exam {
 
     private final List<QuestionAndAnswer> QnA_List = new ArrayList<>();
 
+    //Every exam have a list of questions and answers, questions and answers are bound together using QuestionAndAnswer class
     public void AddQuestion(String question, Answer answer) {
         QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer);
         QnA_List.add(QnA);
     }
 
-    public void SetDate(int [] dayMonthYear) {
-        date = LocalDate.of(dayMonthYear[2],dayMonthYear[1],dayMonthYear[0]);
+    public void SetDate(int[] dayMonthYear) {
+        date = LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
     }
 
     public void EditType(String type) {
@@ -30,22 +31,20 @@ public class Exam {
         int day = date.getDayOfMonth();
         int month = date.getMonthValue();
         int year = date.getYear();
-        return ""+ (day<10?"0" + day : day) + "/" + (month<10?"0" + month : month) + "/" + (year<100?"20" + year : year);
+        return "" + (day < 10 ? "0" + day : day) + "/" + (month < 10 ? "0" + month : month) + "/" + (year < 100 ? "20" + year : year);
     }
 
-    public void PrintQuestions(){
-        for (QuestionAndAnswer QnA : QnA_List){
+    public void PrintQuestions() {
+        for (QuestionAndAnswer QnA : QnA_List) {
             QnA.printQuestion();
         }
     }
 
-    public void PrintQuestionsWithAnswers(){
-        for (QuestionAndAnswer QnA : QnA_List){
+    public void PrintQuestionsWithAnswers() {
+        for (QuestionAndAnswer QnA : QnA_List) {
             QnA.printQuestionAndAnswer();
         }
     }
-
-
 
 
 }

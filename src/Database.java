@@ -26,6 +26,7 @@ public class Database {
         }
     }
 
+    //User logging in process does not matter if the person is an instructor or a student, since the userList stores both.
     public User logIn(int ID, String password) throws WrongEmailException, WrongPasswordException {
         for (User user : userList) {
             if (user.getSchoolID() == ID) {
@@ -43,22 +44,23 @@ public class Database {
         return null;
     }
 
-    public void addLesson(Lesson lesson){
+    public void addLesson(Lesson lesson) {
         lessonList.add(lesson);
     }
 
-    public Lesson FindLesson(String lessonName) throws LessonNotFoundException{
-        for (Lesson lesson : lessonList){
-            if (Objects.equals(lesson.getName(), lessonName)){
+    //This function seeks a lesson with the given name in the lessonList of database.
+    public Lesson FindLesson(String lessonName) throws LessonNotFoundException {
+        for (Lesson lesson : lessonList) {
+            if (Objects.equals(lesson.getName(), lessonName)) {
                 return lesson;
             }
         }
         throw new LessonNotFoundException();
     }
 
-    public void showLessons(){
+    public void showLessons() {
         System.out.println("Lessons in database");
-        for (Lesson lesson : lessonList){
+        for (Lesson lesson : lessonList) {
             System.out.println(lesson.getName());
         }
     }

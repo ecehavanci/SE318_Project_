@@ -28,6 +28,7 @@ class ClassicalAnswer extends Answer {
 }
 
 class MultipleChoiceAnswer extends Answer {
+    //MultipleChoiceAnswer stores a choice list that represents the choices (A, B, C,...)
     List<Choice> choices = new ArrayList<>();
 
     public void addChoice(String choice, boolean isRightChoice) {
