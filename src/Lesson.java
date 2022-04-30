@@ -2,9 +2,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Lesson {
-    private Instructor instructor;
+    private final Instructor instructor;
     private String name;
 
+    //A lesson has an instructor and a name
     public Lesson(String name, Instructor instructor) {
         this.name = name;
         this.instructor = instructor;
@@ -32,7 +33,7 @@ public class Lesson {
         this.name = name;
     }
 
-    //All exams in a lesson can be printed out
+    //Exam details consists of the lesson exam belongs to, exam's name, type and date
     public void ShowExamDetails() {
         for (int i = 0; i < examList.size(); i++) {
             Exam e = examList.get(i);

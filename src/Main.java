@@ -8,8 +8,6 @@ public class Main {
         Database database = new Database();
 
         while (true) {
-
-
             User user = ShowMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");

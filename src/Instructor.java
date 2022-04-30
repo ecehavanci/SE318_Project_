@@ -28,7 +28,7 @@ public class Instructor extends User {
         throw new LessonNotFoundException();
     }
 
-    //This function prints out all the lessons in the Instructor
+    //This function prints out all the lessons an instructor has
     public void printLessons() {
         if (lessonList.size() != 0) {
             System.out.println("Here are the lessons you are giving:");
@@ -46,6 +46,7 @@ public class Instructor extends User {
         Lesson lesson = FindLesson(lessonName);
         lesson.Print();
 
+        //Instructor can choose to edit or not
         System.out.println("Would you like to change details of this lesson?");
         Scanner scan = new Scanner(System.in);
         String yesNoChoice = scan.nextLine().toUpperCase(Locale.ROOT);
@@ -69,11 +70,16 @@ public class Instructor extends User {
                 lesson.setName(scan.nextLine());
             }
             case 2 -> {
+                //Exam details are shown to instructor to choose what to edit
                 lesson.ShowExamDetails();
+
+                //Instructor chooses which exam they want to edit from the exam list by identifying the index (Users will think
+                //first index is one, second index is 2 and so on. But actually first index is 0 and second index is 1, and it
+                //continues like that. So code manages it by subtracting 1 from desired index)
                 System.out.println("Which exam would you like to edit?");
                 int editedExamIndex = scan.nextInt();
 
-                if (editedExamIndex >= 0 || editedExamIndex <= lesson.ExamCount()) {
+                if (editedExamIndex >= 1 || editedExamIndex <= lesson.ExamCount()) {
                     System.out.println("What would you like to edit?");
                     System.out.println("1) Exam type");
                     System.out.println("2) Exam date");
@@ -85,17 +91,17 @@ public class Instructor extends User {
                     switch (editChoice) {
                         case 1 -> {
                             System.out.println("What is the new type?");
+                            //1 subtracted here to get the desired index
                             lesson.GetExam(editedExamIndex - 1).EditType(scan.nextLine());
                         }
 
                         case 2 -> {
                             System.out.println("What is the new date?");
+                            //1 subtracted here to get the desired index
                             Main.SetDate(lesson.GetExam(editedExamIndex - 1));
                         }
                         default -> System.out.println("Cancelling...");
                     }
-
-
                 } else System.out.println("Please choose a valid number");
             }
             default -> System.out.println("Cancelling...");
