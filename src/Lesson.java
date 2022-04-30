@@ -36,6 +36,7 @@ public class Lesson {
     public void ShowExamDetails() {
         for (int i = 0; i < examList.size(); i++) {
             Exam e = examList.get(i);
+            System.out.println("Lesson name: " + name);
             System.out.println("EXAM " + (i + 1));
             System.out.println("Exam type: " + e.GetType());
             System.out.println("Date: " + e.GetDate());

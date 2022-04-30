@@ -22,7 +22,7 @@ public class Exam {
     public void EditType(String type) {
         this.type = type;
     }
-
+    
     public String GetType() {
         return type;
     }
