@@ -1,7 +1,8 @@
+
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws LessonNotFoundException, WrongChoiceException {
         Scanner scan = new Scanner(System.in);
         System.out.println("~Welcome to Exam Management System~");
         Database database = new Database();
@@ -13,7 +14,7 @@ public class Main {
             System.out.println("Welcome, " + user.getName() + ".");
 
             if (Objects.equals(user.getToken(), "student")) {
-                System.out.println("Here are your lessons:");
+
                 //TODO: Show lessons
                 //TODO: Add logging out when structure is formed
 
@@ -32,21 +33,19 @@ public class Main {
 
                     switch (insChoice) {
                         case 1 -> {
-                            //list all lessons in db
-                            // enroll according to index in list
-                            //unenroll acccording to index in list
+                            enrollUnroll(database, student);
                         }
                         case 2 -> {
                             //list all enrolled lessons in std class
+                            student.printLessons();
 
                         }
                         case 3 -> {
-                            //search the enrolled lesson in lesson class
-                            //use lesson.showexamdetails()
+                            seeExamInfo(database, student);
                         }
                         case 4 -> {
                             System.out.println("Logging out...");
-                            willLogOut = false;
+                            willLogOut = true;
                         }
 
                     }
@@ -123,6 +122,11 @@ public class Main {
                 }
             }
         }
+    }
+
+    private static void seeExamInfo(Database database, Student student) {
+        Scanner scan = new Scanner(System.in);
+        student.getExams();
     }
 
     public static void BuildUpExam(Instructor inst) throws LessonNotFoundException {
@@ -246,8 +250,6 @@ public class Main {
                 System.out.println("An error occurred while adding the exam, please try again later.");
             }
         }
-
-
     }
 
     public static User ShowMainMenu(Database db) {
@@ -342,6 +344,31 @@ public class Main {
         }
     }
 
+    public static void enrollUnroll(Database database, Student student) throws WrongChoiceException, LessonNotFoundException {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Do you want to enroll or uneroll in lessons?");
+        String enrollChoice = scan.nextLine();
+
+        if (enrollChoice.equals("enroll")) {// enroll according to name in list
+            System.out.println("You can enroll in these lessons");
+            database.showLessons();//list all lessons in
+
+            System.out.println("Please choose one of the lessons and write it's name to enroll");
+            String choosenLesson = scan.nextLine();
+            Lesson foundedLesson = database.FindLesson(choosenLesson);
+            student.enrollLesson(foundedLesson);
+
+        } else if (enrollChoice.equals("unenroll")) { // unenroll according to name in list
+            System.out.println("You can unenroll from your lessons");
+            student.printLessons();
+            String choosenLesson = scan.nextLine();
+            Lesson foundedLesson = database.FindLesson(choosenLesson);
+            student.unenrollLesson(foundedLesson);
+        } else
+            throw new WrongChoiceException();
+
+
+    }
 
 }
 

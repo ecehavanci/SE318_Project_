@@ -81,3 +81,9 @@ class LessonNotFoundException extends Exception {
     public LessonNotFoundException() {
     }
 }
+
+class WrongChoiceException extends Exception{
+    public WrongChoiceException(){
+        System.out.println("");
+    }
+}
