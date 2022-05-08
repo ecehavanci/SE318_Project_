@@ -1,8 +1,6 @@
 import java.util.*;
 
 public abstract class Answer {
-    protected boolean evaluatedDirectly;
-
     //print() function prints the part of the answer which should be shown with a question (For example all the A-B-C choices,
     //True/False choices) -> This will be used while a student taking an exam
     public abstract void print();
@@ -29,7 +27,6 @@ class ClassicalAnswer extends Answer {
     //A classical answer can be blank or a text might be given
     ClassicalAnswer(String answerText) {
         text = answerText;
-        evaluatedDirectly = false;
         rightAnswer="undefined";
     }
 
@@ -51,10 +48,6 @@ class ClassicalAnswer extends Answer {
 class MultipleChoiceAnswer extends Answer {
     //MultipleChoiceAnswer stores a choice list that represents the choices (A, B, C,...)
     private final List<Choice> choices = new ArrayList<>();
-
-    public MultipleChoiceAnswer(){
-        evaluatedDirectly = true;
-    }
 
     //We can add a choice without exposing list
     public void addChoice(Choice choice) {
@@ -103,7 +96,6 @@ class TrueFalseAnswer extends Answer {
     //that only T or F can be given as input to here.
     public TrueFalseAnswer(char answer) {
         this.answer = answer;
-        evaluatedDirectly = true;
         rightAnswer=Character.toString(answer);
     }
 

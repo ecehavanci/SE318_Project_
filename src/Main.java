@@ -7,13 +7,9 @@ public class Main {
         System.out.println("~Welcome to Exam Management System~");
         Database database = new Database();
 
-        //I create here one instance of each user to help me debug:
+        //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
+        IMPORT_DEFAULTS(database);
 
-        Instructor inst= new Instructor("Johnny", "Black", 1,"1");
-        Student stdt = new Student("Gerard", "McCharty", 2,"2");
-
-        database.userList.add(inst);
-        database.userList.add(stdt);
 
         while (true) {
             User user = ShowMainMenu(database);
@@ -237,14 +233,14 @@ public class Main {
                         answerText = scan.nextLine();
                     }
 
-                    System.out.println("How much point is this question?");
+                    System.out.println("How many points is this question?");
                     int point = scan.nextInt();
                     scan.nextLine();
                     examPointTotal += point;
 
                     //A classical question (and its answer if desired) is created since choice 1 indicates classical question
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
-                    exam.AddQuestion(questionText, ca, point);
+                    exam.AddQuestion(questionText, ca, point, false);
 
 
                 }
@@ -294,8 +290,8 @@ public class Main {
                     scan.nextLine();
                     examPointTotal += point;
 
-                    //Question is added along with answer and the point of it
-                    exam.AddQuestion(questionText, mca, point);
+                    //Multiple choice question is added along with answer and the point of it
+                    exam.AddQuestion(questionText, mca, point, true);
                 }
                 case 3 -> {
                     System.out.println("Question: ");
@@ -313,7 +309,8 @@ public class Main {
                     scan.nextLine();
                     examPointTotal += point;
 
-                    exam.AddQuestion(questionText, tfa, point);
+                    //True/false question is added along with answer and the point of it
+                    exam.AddQuestion(questionText, tfa, point, true);
                 }
 
                 case 4 -> isDone = true;
@@ -473,6 +470,84 @@ public class Main {
         } else
             //If an input is given other than enroll or unenroll, system throws an error
             throw new WrongChoiceException();
+
+    }
+
+
+
+
+
+
+
+
+    //THIS METHOD IS FOR HELPING US DEBUG THE PROCESS: It creates default users, lessons, exams etc. to see how changes affect.
+
+    public static void IMPORT_DEFAULTS(Database db){
+        //Two default users: Instructor Johnny and student Gerard
+        Instructor instructorJ= new Instructor("Johnny", "Black", 1,"1");
+        Student studentG = new Student("Gerard", "McCarthy", 2,"2");
+
+        db.userList.add(instructorJ);
+        db.userList.add(studentG);
+
+        //Johnny gives lesson BIO 101.
+        try {
+            db.addLesson(instructorJ.addAndReturnLesson("BIO 101"));
+        } catch (LessonAlreadyExistsException e) {
+            e.printStackTrace();
+        }
+
+        //Gerard takes lesson BIO 101.
+        try {
+            studentG.enrollLesson(db.FindLesson("BIO 101"));
+        } catch (LessonNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //BIO EXAM:
+        Exam exam = new Exam();
+        String classicalQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
+        Answer classicalAnswer1 = new ClassicalAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
+        classicalAnswer1.setRightAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
+        exam.AddQuestion(classicalQuestion1,classicalAnswer1,30,false);
+
+        String trueFalseQuestion1 = "Mushrooms are classified as plants.";
+        Answer trueFalseAnswer1 = new TrueFalseAnswer('F');
+        exam.AddQuestion(trueFalseQuestion1,trueFalseAnswer1,5,true);
+
+        String trueFalseQuestion2 = "Mammals are known for laying eggs.";
+        Answer trueFalseAnswer2 = new TrueFalseAnswer('F');
+        exam.AddQuestion(trueFalseQuestion2,trueFalseAnswer2,5,true);
+
+        String trueFalseQuestion3 = "Humans and dinosaurs never lived in the same era.";
+        Answer trueFalseAnswer3 = new TrueFalseAnswer('T');
+        exam.AddQuestion(trueFalseQuestion3,trueFalseAnswer3,5,true);
+
+        String multipleChoiceQuestion1 = "Which human species did homo sapiens lived together with?";
+        MultipleChoiceAnswer multipleChoiceAnswer1 = new MultipleChoiceAnswer();
+        multipleChoiceAnswer1.addChoice(new Choice("Homo habilis", false));
+        multipleChoiceAnswer1.addChoice(new Choice("Homo rufoldensis", false));
+        multipleChoiceAnswer1.addChoice(new Choice("Homo neanderthalensis", true));
+        multipleChoiceAnswer1.addChoice(new Choice("Homo rhodesiensis", false));
+        multipleChoiceAnswer1.setRightAnswer("C");
+
+        exam.AddQuestion(multipleChoiceQuestion1,multipleChoiceAnswer1,10,true);
+
+        String classicalQuestion2 = "Summarize Lamarckian Eveolution in 2-3 sentences and give an example.";
+        Answer classicalAnswer2 = new ClassicalAnswer("");
+        exam.AddQuestion(classicalQuestion2,classicalAnswer2,45,false);
+
+        exam.setPoint(100);
+        exam.EditType("Midterm");
+        exam.SetDate(new int[]{6, 6, 2022});
+
+        try {
+            db.FindLesson("BIO 101").AddExam(exam);
+        } catch (LessonNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 

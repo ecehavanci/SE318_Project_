@@ -117,11 +117,9 @@ public class Instructor extends User {
 
             for (int i = 0; i < sheets.size(); i++) {
                 System.out.println("Student " + (i + 1));
-
                 for (int j = 0; j < QnA_List.size(); j++) {
-                    System.out.println("Unevaluated question " + (j + 1));
-
-                    if (!QnA_List.get(i).getAnswer().evaluatedDirectly) {
+                    if (!QnA_List.get(j).isEvaluatedDirectly()) {
+                        System.out.println("Unevaluated question: QUESTION " + (j + 1));
                         System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
                         System.out.println();
 
@@ -141,7 +139,7 @@ public class Instructor extends User {
                         System.out.println();
                     }
                 }
-                System.out.println("This sheet got " + sheets.get(i).getGrade());
+                System.out.println("This sheet got " + sheets.get(i).getGrade() );
 
                 System.out.println("Do you approve?");
                 System.out.println("1) Approve");
@@ -158,5 +156,6 @@ public class Instructor extends User {
                 }
             }
         }
+        System.out.println("All exam sheets are revised.");
     }
 }

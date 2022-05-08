@@ -5,12 +5,14 @@ public class QuestionAndAnswer {
     private final String question;
     private final Answer answer;
     private final int point;
+    private boolean evaluatedDirectly = false;
 
     //A question is bound to its particular answer using this class
-    public QuestionAndAnswer(String question, Answer answer, int point) {
+    public QuestionAndAnswer(String question, Answer answer, int point, boolean evaluatedDirectly) {
         this.question = question;
         this.answer = answer;
         this.point=point;
+        this.evaluatedDirectly=evaluatedDirectly;
     }
 
     //Questions are printed with their possible answers (nothing for classical type questions, with choices for multiple choice
@@ -39,5 +41,9 @@ public class QuestionAndAnswer {
 
     public int getPoint() {
         return point;
+    }
+
+    public boolean isEvaluatedDirectly() {
+        return evaluatedDirectly;
     }
 }

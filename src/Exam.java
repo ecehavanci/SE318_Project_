@@ -20,8 +20,8 @@ public class Exam {
     }
 
     //Every exam have a list of questions and answers, questions and answers are bound together using QuestionAndAnswer class
-    public void AddQuestion(String question, Answer answer, int point) {
-        QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer, point);
+    public void AddQuestion(String question, Answer answer, int point, boolean evaluatedDirectly) {
+        QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer, point, evaluatedDirectly);
         QnA_List.add(QnA);
     }
 
@@ -114,7 +114,7 @@ public class Exam {
             System.out.println("Question:\n" + QnA_List.get(i).getQuestion());
             System.out.println();
 
-            if (!QnA_List.get(i).getAnswer().evaluatedDirectly) {
+            if (!QnA_List.get(i).isEvaluatedDirectly()) {
                 System.out.println("Question " + (i + 1) + " won't be evaluated directly");
                 notEvaluatedPointsCount += QnA_List.get(i).getPoint();
                 System.out.println();
