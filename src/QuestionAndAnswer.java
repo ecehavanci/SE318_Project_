@@ -4,11 +4,13 @@ public class QuestionAndAnswer {
     //choice question and the right choice together
     private final String question;
     private final Answer answer;
+    private final int point;
 
     //A question is bound to its particular answer using this class
-    public QuestionAndAnswer(String question, Answer answer) {
+    public QuestionAndAnswer(String question, Answer answer, int point) {
         this.question = question;
         this.answer = answer;
+        this.point=point;
     }
 
     //Questions are printed with their possible answers (nothing for classical type questions, with choices for multiple choice
@@ -25,5 +27,17 @@ public class QuestionAndAnswer {
         printQuestion();
         answer.printResult();
         System.out.println();
+    }
+
+    public Answer getAnswer() {
+        return answer;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public int getPoint() {
+        return point;
     }
 }

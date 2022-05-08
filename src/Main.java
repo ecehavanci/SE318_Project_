@@ -7,6 +7,14 @@ public class Main {
         System.out.println("~Welcome to Exam Management System~");
         Database database = new Database();
 
+        //I create here one instance of each user to help me debug:
+
+        Instructor inst= new Instructor("Johnny", "Black", 1,"1");
+        Student stdt = new Student("Gerard", "McCharty", 2,"2");
+
+        database.userList.add(inst);
+        database.userList.add(stdt);
+
         while (true) {
             User user = ShowMainMenu(database);
 
@@ -27,16 +35,19 @@ public class Main {
                     System.out.println("3) See all exam informations");
                     System.out.println("4) Log out");
 
+                    //EXPERIMENTAL ADDITION
+                    System.out.println("5) Take Exam");
+
+
                     int insChoice = scan.nextInt();
                     scan.nextLine();
 
                     switch (insChoice) {
                         case 1 -> {
-                            try{
+                            try {
                                 enrollUnroll(database, student);
-                            }
-                            catch (WrongChoiceException WCE){
-                                System.out.println("Unexpected output");
+                            } catch (WrongChoiceException WCE) {
+                                System.out.println("Unexpected input");
                             }
 
                         }
@@ -53,6 +64,38 @@ public class Main {
                             willLogOut = true;
                         }
 
+                        //EXPERIMENTAL ADDITION
+                        case 5 -> {
+                            //System.out.println("Your upcoming exams:");
+                            if (student.ExamCountTotal() > 0) {
+                                student.getExams();
+
+                                System.out.println("Which lesson's exam do you want to take?");
+                                String lessonName = scan.nextLine();
+                                if (student.ExamCountInLesson(lessonName) > 0) {
+                                    Lesson lesson = null;
+                                    try {
+                                        lesson = database.FindLesson(lessonName);
+                                    } catch (LessonNotFoundException LNFE) {
+                                        System.out.println("Lesson not found");
+                                    }
+
+                                    if (lesson != null) {
+                                        System.out.println("Which exam do you want to take?");
+                                        int examIndex = scan.nextInt();
+                                        scan.nextLine();
+                                        try {
+                                            Exam exam = lesson.GetExam(examIndex - 1);
+                                            exam.takeExam(student);
+                                        } catch (IndexOutOfBoundsException IOOBE) {
+                                            System.out.println("There is no exam in the given index");
+                                        }
+                                    }
+                                }
+                            } else {
+                                System.out.println("You don't have any exams");
+                            }
+                        }
                     }
                     if (willLogOut) {
                         break;
@@ -60,8 +103,7 @@ public class Main {
                 }
 
 
-            }
-            else if (Objects.equals(user.getToken(), "instructor")) {
+            } else if (Objects.equals(user.getToken(), "instructor")) {
                 Instructor instructor = (Instructor) user;
                 while (true) {
                     boolean willLogOut = false;
@@ -90,8 +132,13 @@ public class Main {
                             String lessonName = scan.nextLine();
 
                             //Instructor has a lesson list, he/she creates and ads a lesson to his/her lesson list with given name
-                            Lesson lesson = instructor.addAndReturnLesson(lessonName, instructor);
-                            database.addLesson(lesson);
+                            try {
+                                Lesson lesson = instructor.addAndReturnLesson(lessonName);
+                                database.addLesson(lesson);
+                            } catch (LessonAlreadyExistsException LAEE) {
+                                System.out.println("Lesson already exists");
+                            }
+
                         }
                         case 2 -> {
                             System.out.print("Name of the lesson: ");
@@ -115,6 +162,18 @@ public class Main {
                         }
                         case 4 -> {
                             //TODO: Grade or approve exams
+                            for (int i = 0; i < instructor.lessonList.size() ; i++) {
+                                instructor.lessonList.get(i).ShowExamDetails();
+                                System.out.println();
+                            }
+
+                            System.out.println("Which lesson's exam do you want to grade: ");
+                            String lessonName = scan.nextLine();
+
+                            System.out.println("Which exam do you want to grade: ");
+                            int examIndex = scan.nextInt();scan.nextLine();
+
+                            instructor.GradeUnevaluatedQuestions(lessonName,examIndex);
                         }
                         case 5 -> {
                             System.out.println("Logging out...");
@@ -147,6 +206,7 @@ public class Main {
         lesson = inst.FindLesson(lessonName);
         boolean isDone = false;
         boolean isCancel = false;
+        int examPointTotal = 0;
 
         //We sequentially add questions (along with their answers if desired) to the exam
         while (true) {
@@ -177,9 +237,14 @@ public class Main {
                         answerText = scan.nextLine();
                     }
 
+                    System.out.println("How much point is this question?");
+                    int point = scan.nextInt();
+                    scan.nextLine();
+                    examPointTotal += point;
+
                     //A classical question (and its answer if desired) is created since choice 1 indicates classical question
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
-                    exam.AddQuestion(questionText, ca);
+                    exam.AddQuestion(questionText, ca, point);
 
 
                 }
@@ -204,16 +269,33 @@ public class Main {
                     }
 
                     //Instructor chooses the right one among all choices:
-                    System.out.println("Which choice is right?");
-                    char choiceCode = scan.nextLine().charAt(0);
+                    char choiceCode;
+                    while (true) {
+                        System.out.println("Which choice is right?");
+                        choiceCode = scan.nextLine().charAt(0);
+
+                        if ((int) choiceCode > (64 + choiceCount)) {
+                            System.out.println("There is no choice " + choiceCode + ". Please enter again.");
+                        }
+                        else{
+                            break;
+                        }
+                    }
 
                     for (int i = 0; i < choiceCount; i++) {
                         //Choices are added one by one with their status (if they are right or wrong answer)
                         mca.addChoice(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
                     }
+                    //this is for storing right answer as String to help grading
+                    mca.setRightAnswer(Character.toString(choiceCode));
 
-                    //Question is added along with answer
-                    exam.AddQuestion(questionText, mca);
+                    System.out.println("How many points is this question?");
+                    int point = scan.nextInt();
+                    scan.nextLine();
+                    examPointTotal += point;
+
+                    //Question is added along with answer and the point of it
+                    exam.AddQuestion(questionText, mca, point);
                 }
                 case 3 -> {
                     System.out.println("Question: ");
@@ -226,10 +308,14 @@ public class Main {
 
                     TrueFalseAnswer tfa = new TrueFalseAnswer(answer);
 
-                    exam.AddQuestion(questionText, tfa);
+                    System.out.println("How much point is this question?");
+                    int point = scan.nextInt();
+                    scan.nextLine();
+                    examPointTotal += point;
 
-
+                    exam.AddQuestion(questionText, tfa, point);
                 }
+
                 case 4 -> isDone = true;
                 case 5 -> isCancel = true;
                 default -> System.out.println("Please enter a valid choice");
@@ -249,6 +335,7 @@ public class Main {
             String examType = scan.nextLine();
             exam.EditType(examType);
 
+            exam.setPoint(examPointTotal);
             try {
                 lesson.AddExam(exam);
                 System.out.println("Exam is successfully added");
@@ -304,7 +391,7 @@ public class Main {
                     }
                 }
                 case 2 -> {
-                    if (db.userList.size()==0){
+                    if (db.userList.size() == 0) {
                         System.out.println("No account created for Exam Management System yet. Please create an account for logging in.");
                         continue;
                     }
@@ -316,7 +403,7 @@ public class Main {
                     try {
                         user = db.logIn(ID, password);
                         isSignedIn = true;
-                    } catch (WrongEmailException WEex) {
+                    } catch (WrongIDException WIex) {
                         System.out.println("Email Not Found");
                     } catch (WrongPasswordException WPex) {
                         System.out.println("Wrong Password");
@@ -354,11 +441,11 @@ public class Main {
         }
     }
 
-    public static void enrollUnroll(Database database, Student student) throws WrongChoiceException{
+    public static void enrollUnroll(Database database, Student student) throws WrongChoiceException {
         Scanner scan = new Scanner(System.in);
 
         //Students can enroll and unenroll to a lesson using "enroll" or "unenroll" input
-        System.out.println("Do you want to enroll or uneroll in lessons?");
+        System.out.println("Do you want to enroll or unenroll in lessons?");
         String enrollChoice = scan.nextLine();
 
         if (enrollChoice.equals("enroll")) {// enroll according to name in list
@@ -367,11 +454,10 @@ public class Main {
 
             System.out.println("Please choose one of the lessons and write its name to enroll");
             String choosenLesson = scan.nextLine();
-            try{
+            try {
                 Lesson foundLesson = database.FindLesson(choosenLesson);
                 student.enrollLesson(foundLesson);
-            }
-            catch (LessonNotFoundException LNFE){
+            } catch (LessonNotFoundException LNFE) {
                 System.out.println("Lesson not found");
             }
         } else if (enrollChoice.equals("unenroll")) { // unenroll according to name in list
@@ -381,8 +467,7 @@ public class Main {
             try {
                 Lesson foundLesson = student.FindLesson(choosenLesson);
                 student.unenrollLesson(foundLesson);
-            }
-            catch (LessonNotFoundException LNFE){
+            } catch (LessonNotFoundException LNFE) {
                 System.out.println("Lesson not found");
             }
         } else

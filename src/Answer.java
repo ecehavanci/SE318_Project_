@@ -11,18 +11,29 @@ public abstract class Answer {
     //B is the right choice, B will be printed out) -> This will be used while a student seeing results of an exam and while
     //an instructor is grading it
     public abstract void printResult();
+
+    protected String rightAnswer = "";
+
+    public String getRightAnswer() {
+        return rightAnswer;
+    }
+
+    public void setRightAnswer(String rightAnswer) {
+        this.rightAnswer = rightAnswer;
+    }
 }
 
 class ClassicalAnswer extends Answer {
-    private String text;
+    private final String text;
 
     //A classical answer can be blank or a text might be given
     ClassicalAnswer(String answerText) {
         text = answerText;
         evaluatedDirectly = false;
+        rightAnswer="undefined";
     }
 
-    //A classical answer has no part in it that can be shown with the question so here print() funcyion prints nothing
+    //A classical answer has no part in it that can be shown with the question so here print() function prints nothing
     @Override
     public void print() {
         //Print Nothing
@@ -51,15 +62,22 @@ class MultipleChoiceAnswer extends Answer {
     @Override
     public void print() {
         for (int i = 0; i < choices.size(); i++) {
-            System.out.println((char) 65 + i + ") " + choices.get(i).text);
+            System.out.println((char) (65 + i) + ") " + choices.get(i).text);
         }
     }
 
     //Only right choice will be printed
     public void printResult() {
+        System.out.println("Right Choice: " + returnRightAnswer());
+    }
+
+
+    private String returnRightAnswer(){
         for (Choice c : choices) {
-            if (c.isRight) System.out.println("Right Choice: " + c.text);
+            if (c.isRight) return c.text;
         }
+        System.out.println("Please report to instructor this question is marked with NO right answer.");
+        return "NO RIGHT ANSWER";
     }
 }
 
@@ -83,6 +101,7 @@ class TrueFalseAnswer extends Answer {
     public TrueFalseAnswer(char answer) {
         this.answer = answer;
         evaluatedDirectly = true;
+        rightAnswer=Character.toString(answer);
     }
 
     //True/false questions only have 2 choices which is true and false, so this is printed (along with the question)

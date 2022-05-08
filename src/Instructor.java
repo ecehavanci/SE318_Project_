@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Instructor extends User {
     public Instructor(String name, String surname, int schoolID, String password) {
@@ -9,11 +6,25 @@ public class Instructor extends User {
         token = "instructor";
     }
 
+    private boolean DoesLessonExists(String lessonName) {
+        for (Lesson lesson : lessonList) {
+            if (Objects.equals(lesson.getName(), lessonName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //This function adds and returns the lesson to instructor's local lessonList so it can be added to the lessonList in the database
-    public Lesson addAndReturnLesson(String lessonName, Instructor instructor) {
-        Lesson newLesson = new Lesson(lessonName, instructor);
-        lessonList.add(newLesson);
-        return newLesson;
+    public Lesson addAndReturnLesson(String lessonName) throws LessonAlreadyExistsException {
+        if (!DoesLessonExists(lessonName)) {
+            Lesson newLesson = new Lesson(lessonName, this);
+            lessonList.add(newLesson);
+            return newLesson;
+        } else {
+            throw new LessonAlreadyExistsException();
+        }
+
     }
 
 
@@ -82,6 +93,67 @@ public class Instructor extends User {
                 } else System.out.println("Please choose a valid number");
             }
             default -> System.out.println("Cancelling...");
+        }
+    }
+
+
+    public void GradeUnevaluatedQuestions(String lessonName, int examIndex) {
+        List<QuestionAndAnswer> QnA_List = null;
+        ArrayList<StudentSheet> sheets = null;
+        try {
+            Lesson lesson = FindLesson(lessonName);
+            if (examIndex-1<=lesson.ExamCount()-1 &&examIndex-1>=0){
+                QnA_List = lesson.GetExam(examIndex-1).getQnA_List();
+                sheets = lesson.GetExam(examIndex-1).getStudentSheetList();
+            }
+            else{
+                System.out.println("There is no exam by the given index.");
+            }
+        } catch (LessonNotFoundException e) {
+            System.out.println("Lesson not found");
+        }
+        if (QnA_List != null && sheets != null) {
+            Scanner scan = new Scanner(System.in);
+            for (int i = 0; i < sheets.size(); i++) {
+                System.out.println("Student " + (i + 1));
+                for (int j = 0; j < QnA_List.size(); j++) {
+                    System.out.println("Unevaluated question " + (j + 1));
+                    if (!QnA_List.get(i).getAnswer().evaluatedDirectly) {
+                        System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
+                        System.out.println();
+
+                        System.out.println("Right Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
+                        System.out.println();
+
+                        System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
+                        System.out.println();
+
+                        System.out.println("Grade the answer out of " + QnA_List.get(j).getPoint());
+                        int point = scan.nextInt();
+                        scan.nextLine();
+
+                        sheets.get(i).addToGrade(point);
+
+                        System.out.println();
+                        System.out.println();
+                    }
+                    System.out.println("This sheet got " + sheets.get(i).getGrade());
+
+                    System.out.println("Do you approve?");
+                    System.out.println("1) Approve");
+                    System.out.println("2) Not approve");
+
+                    int approval = scan.nextInt();
+                    scan.nextLine();
+
+                    if (approval==1){
+                        sheets.get(i).setApproved(true);
+                    }
+                    else if (approval==2){
+                        sheets.get(i).setApproved(false);
+                    }
+                }
+            }
         }
     }
 }

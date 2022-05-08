@@ -46,7 +46,7 @@ public abstract class User {
     public void printLessons() {
         //Unless the lessonList's size is 0, all lessons in lessonList is printed out
         if (lessonList.size() != 0) {
-            System.out.println("Here are the lessons you are taking:");
+            System.out.println("Those are your lessons:");
             for (Lesson lesson : lessonList) {
                 System.out.println(lesson.getName());
             }
@@ -63,5 +63,26 @@ public abstract class User {
             }
         }
         throw new LessonNotFoundException();
+    }
+
+
+    //EXPERIMENTAL ADDITON
+    public int ExamCountInLesson(String lessonName){
+        try {
+            Lesson lesson = FindLesson(lessonName);
+            return lesson.ExamCount();
+        }
+        catch (LessonNotFoundException LNFE){
+            System.out.println("Lesson not found");
+        }
+        return 0;
+    }
+
+    public int ExamCountTotal(){
+        int count = 0;
+        for (Lesson lesson : lessonList) {
+            count += lesson.ExamCount();
+        }
+        return count;
     }
 }
