@@ -86,7 +86,7 @@ public class Main {
                                         scan.nextLine();
                                         try {
                                             Exam exam = lesson.GetExam(examIndex - 1);
-                                            exam.takeExam(student);
+                                            exam.take(student);
                                         } catch (IndexOutOfBoundsException IOOBE) {
                                             System.out.println("There is no exam in the given index");
                                         }

@@ -52,10 +52,13 @@ class MultipleChoiceAnswer extends Answer {
     //MultipleChoiceAnswer stores a choice list that represents the choices (A, B, C,...)
     private final List<Choice> choices = new ArrayList<>();
 
+    public MultipleChoiceAnswer(){
+        evaluatedDirectly = true;
+    }
+
     //We can add a choice without exposing list
     public void addChoice(Choice choice) {
         choices.add(choice);
-        evaluatedDirectly = true;
     }
 
     //All choices of the question will be printed (with the question)

@@ -114,10 +114,13 @@ public class Instructor extends User {
         }
         if (QnA_List != null && sheets != null) {
             Scanner scan = new Scanner(System.in);
+
             for (int i = 0; i < sheets.size(); i++) {
                 System.out.println("Student " + (i + 1));
+
                 for (int j = 0; j < QnA_List.size(); j++) {
                     System.out.println("Unevaluated question " + (j + 1));
+
                     if (!QnA_List.get(i).getAnswer().evaluatedDirectly) {
                         System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
                         System.out.println();
@@ -137,21 +140,21 @@ public class Instructor extends User {
                         System.out.println();
                         System.out.println();
                     }
-                    System.out.println("This sheet got " + sheets.get(i).getGrade());
+                }
+                System.out.println("This sheet got " + sheets.get(i).getGrade());
 
-                    System.out.println("Do you approve?");
-                    System.out.println("1) Approve");
-                    System.out.println("2) Not approve");
+                System.out.println("Do you approve?");
+                System.out.println("1) Approve");
+                System.out.println("2) Not approve");
 
-                    int approval = scan.nextInt();
-                    scan.nextLine();
+                int approval = scan.nextInt();
+                scan.nextLine();
 
-                    if (approval==1){
-                        sheets.get(i).setApproved(true);
-                    }
-                    else if (approval==2){
-                        sheets.get(i).setApproved(false);
-                    }
+                if (approval==1){
+                    sheets.get(i).setApproved(true);
+                }
+                else if (approval==2){
+                    sheets.get(i).setApproved(false);
                 }
             }
         }

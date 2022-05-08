@@ -72,7 +72,7 @@ public class Exam {
     }
 
     //EXPERIMENTAL ADDITION
-    public void takeExam(Student student) {
+    public void take(Student student) {
         System.out.println("\n\n~" + type.toUpperCase(Locale.ROOT) + "~\n");
         Scanner scan = new Scanner(System.in);
         ArrayList<String> studentAnswers = new ArrayList<>();
