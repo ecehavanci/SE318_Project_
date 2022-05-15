@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,17 +28,19 @@ public class Database {
         try {
             CheckUserExists(schoolID);
 
-            FileWriter fw = new FileWriter(userListText, true);
+            if (!DoesUserExistInStoringFiles(schoolID)) {
+                FileWriter fw = new FileWriter(userListText, true);
 
-            File CourseListText = new File(schoolID + "_CourseList.txt");
-            CourseListText.createNewFile();
+                File CourseListText = new File(schoolID + "_CourseList.txt");
+                CourseListText.createNewFile();
 
-            fw.write("instructor," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + "\n");
-            fw.close();
-
+                fw.write("instructor," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + "\n");
+                fw.close();
+            }
             User newUser = new Instructor(name, surname, schoolID, password);
             userList.add(newUser);
             System.out.println("Registration successful.");
+
 
         } catch (UserAlreadyExistsException UAEE) {
             System.out.println("This school id already exists, please try again.");
@@ -48,18 +52,21 @@ public class Database {
     public void registerStudent(String name, String surname, int schoolID, String password) {
         try {
             CheckUserExists(schoolID);
-            FileWriter fw = new FileWriter(userListText, true);
 
-            File CourseListText = new File(schoolID + "_CourseList.txt");
-            CourseListText.createNewFile();
+            if (!DoesUserExistInStoringFiles(schoolID)) {
+                FileWriter fw = new FileWriter(userListText, true);
 
-            fw.write("student," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + "\n");
-            fw.close();
+                File CourseListText = new File(schoolID + "_CourseList.txt");
+                CourseListText.createNewFile();
 
-            CheckUserExists(schoolID);
+                fw.write("student," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + "\n");
+                fw.close();
+            }
             User newUser = new Student(name, surname, schoolID, password);
             userList.add(newUser);
             System.out.println("Registration successful.");
+
+
         } catch (UserAlreadyExistsException UAEE) {
             System.out.println("This school id already exists, please try again.");
         } catch (IOException e) {
@@ -131,6 +138,7 @@ public class Database {
         return false;
     }
 
+
     private void CheckUserExists(int ID) throws UserAlreadyExistsException {
         for (User user : userList) {
             if (user.getSchoolID() == ID) {
@@ -146,8 +154,11 @@ public class Database {
         }
     }
 
-    public void IMPORT() throws IOException, CourseAlreadyExistsException {
-        BufferedReader br = new BufferedReader(new FileReader(userListText));
+    public void IMPORT() throws IOException, CourseAlreadyExistsException, CourseNotFoundException {
+        FileReader fr = new FileReader(userListText);
+        BufferedReader br = new BufferedReader(fr);
+        List<String> myfilevar = Files.readAllLines(Paths.get("UserList.txt"));
+        System.out.println(myfilevar);
         String st;
         while ((st = br.readLine()) != null) {
             String[] dataArray = st.split(",");
@@ -155,6 +166,8 @@ public class Database {
             if (dataArray[0].equals("instructor")) {
                 int ID = Integer.parseInt(dataArray[2]);
                 userList.add(new Instructor(dataArray[3], dataArray[4], ID, dataArray[2]));
+
+                System.out.println(st);
 
                 Instructor instructor = null;
                 try {
@@ -181,6 +194,8 @@ public class Database {
                 }
 
             } else if (dataArray[0].equals("student")) {
+                System.out.println(st);
+
                 int ID = Integer.parseInt(dataArray[2]);
                 userList.add(new Student(dataArray[3], dataArray[4], ID, dataArray[2]));
 
@@ -192,19 +207,21 @@ public class Database {
                 }
                 if (student != null) {
                     File usersCourseList = new File(dataArray[5]);
-
                     BufferedReader br2 = new BufferedReader(new FileReader(usersCourseList));
                     String data;
                     while ((data = br2.readLine()) != null) {
-                        String[] dataArray2 = data.split(",");
-                        student.courseList.add(new Course(dataArray2[0], (Instructor) FindUser(Integer.parseInt(dataArray2[1]))));
+                        student.courseList.add(FindCourse(data));
                     }
                     br2.close();
                 }
+
             } else {
                 System.out.println("Problem with database importing!!!!!");
                 break;
             }
+
+            fr.close();
+            br.close();
 
 
         }
@@ -237,7 +254,7 @@ public class Database {
         String st;
         while ((st = br.readLine()) != null) {
             String[] dataArray = st.split(",");
-            if (ID == Integer.parseInt(dataArray[0])) {
+            if (ID == Integer.parseInt(dataArray[1])) {
                 return true;
             }
         }

@@ -11,4 +11,21 @@ schoolID, password, name, surname, lessonList.txt
 EXAMPLE: 1234, p1234, John, Roseland, 1234_lessonList.txt
 
 
+HIERARCHY:
+Hieararcy is as follows:
+Users have courses
+Courses have Instructors and Exams
+Exams have QuestionAndAnswers
+
+STORING A PARTICULAR USER'S COURSES:
+System allows us to find a lesson only from the name, so here courses are stored only with their names. So to courses to be stored in the
+general courses list with full information (thier name, instructorsText, examsText, etc.) is enough.
+
+
+
+****ERROR HELPER PART****
+it tells 0_instructor because you are storing indexes instead of names in 1_courselist
+
+
+
 

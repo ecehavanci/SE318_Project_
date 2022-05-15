@@ -39,7 +39,7 @@ public class Instructor extends User {
             String fileName = getSchoolID()+"_CourseList.txt";
             FileWriter fw = new FileWriter(fileName, true);
             String courseIndex = String.valueOf(db.ReturnOrCreateCourseIndex(course));
-            fw.write(courseIndex);
+            fw.write(courseIndex + "," + this.getSchoolID());
             fw.close();
 
             return course;

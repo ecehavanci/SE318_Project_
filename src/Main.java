@@ -13,14 +13,21 @@ public class Main {
             System.out.println("Cannot initiating system. Exitting...");
             System.exit(0);
         } catch (CourseAlreadyExistsException e) {
-
+            //No problem in importing, of course it will exist at some point, this exception is for catching in-system errors.
+        } catch (CourseNotFoundException e) {
+            e.printStackTrace();
         }
+
         System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
-        IMPORT_DEFAULTS(database);
+        IMPORT_DEFAULTS();
 
 
         while (true) {
+
+            for (User user: database.userList){
+                System.out.println(user.getName());
+            }
             User user = ShowMainMenu(database);
 
             System.out.println("Welcome, " + user.getName() + ".");
@@ -511,21 +518,25 @@ public class Main {
 
     //THIS METHOD IS FOR HELPING US DEBUG THE PROCESS: It creates default users, courses, exams etc. to see how changes affect.
 
-    public static void IMPORT_DEFAULTS(Database db){
-        //Two default users: Instructor Johnny and students Gerard, Alice and Cheryll
+    public static void IMPORT_DEFAULTS(){
+        Database db = Database.getInstance();
+        //Four default users: Instructor John and students Gerard, Alice and Cheryll
         db.registerInstructor("John", "Roseland", 1,"1");
-        db.registerStudent("Gerard", "Greene", 2,"2");
-        db.registerStudent("Alice", "King", 3,"3");
-        db.registerStudent("Cheryll", "Basket", 4,"4");
+        db.registerInstructor("William", "Wood", 2,"2");
+        db.registerStudent("Gerard", "Greene", 3,"3");
+        db.registerStudent("Alice", "King", 4,"4");
+        db.registerStudent("Cheryll", "Basket", 5,"5");
 
         Instructor instructorJ = (Instructor) db.userList.get(0);
-        Student studentG = (Student) db.userList.get(1);
-        Student studentA = (Student) db.userList.get(2);
-        Student studentC = (Student) db.userList.get(3);
+        Instructor instructorW = (Instructor) db.userList.get(1);
+        Student studentG = (Student) db.userList.get(2);
+        Student studentA = (Student) db.userList.get(3);
+        Student studentC = (Student) db.userList.get(4);
 
         //Johnny gives course BIO 101.
         try {
             db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"));
+            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"));
         } catch (CourseAlreadyExistsException e) {
             e.printStackTrace();
         } catch (IOException e) {
