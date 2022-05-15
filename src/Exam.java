@@ -76,6 +76,7 @@ public class Exam {
         System.out.println("\n\n~" + type.toUpperCase(Locale.ROOT) + "~\n");
         Scanner scan = new Scanner(System.in);
         ArrayList<String> studentAnswers = new ArrayList<>();
+        ArrayList<Integer> gradeList = new ArrayList<>();
 
         for (QuestionAndAnswer QnA : QnA_List) {
             QnA.printQuestion();
@@ -87,7 +88,7 @@ public class Exam {
             System.out.println();
         }
 
-        StudentSheet sheet = new StudentSheet(student, studentAnswers);
+        StudentSheet sheet = new StudentSheet(student, studentAnswers, gradeList);
         studentSheetList.add(sheet);
         System.out.println("Exam successfully submitted");
         ShowResult(sheet);
@@ -118,6 +119,7 @@ public class Exam {
                 System.out.println("Question " + (i + 1) + " won't be evaluated directly");
                 notEvaluatedPointsCount += QnA_List.get(i).getPoint();
                 System.out.println();
+                sheet.getGradeList().add(-1);
                 continue;
             }
 
@@ -129,16 +131,21 @@ public class Exam {
 
             if (Objects.equals(sheet.getAnswer(i), QnA_List.get(i).getAnswer().getRightAnswer())) {
                 sheet.addToGrade(QnA_List.get(i).getPoint());
+                sheet.getGradeList().add(QnA_List.get(i).getPoint());
             }
+            else{
+                sheet.getGradeList().add(0);
+            }
+
             System.out.println();
             System.out.println();
         }
         System.out.println(notEvaluatedPointsCount + " points will not be evaluated directly.");
     }
 
-    public boolean AreAllSheetsApproved(){
-        for (StudentSheet sheet : studentSheetList){
-            if (!sheet.isApproved()){
+    public boolean AreAllSheetsApproved() {
+        for (StudentSheet sheet : studentSheetList) {
+            if (!sheet.isApproved()) {
                 return false;
             }
         }

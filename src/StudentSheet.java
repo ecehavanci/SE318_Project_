@@ -7,7 +7,12 @@ import java.util.ArrayList;
 public class StudentSheet {
     private final Student student;
     private final ArrayList<String> answersList;
+    private final ArrayList<Integer> gradeList;
     private int grade;
+
+    public ArrayList<Integer> getGradeList() {
+        return gradeList;
+    }
 
     //Students will be able to see their grade only when their grade is approved
     private boolean approved = false;
@@ -32,9 +37,10 @@ public class StudentSheet {
         return grade;
     }
 
-    public StudentSheet(Student student, ArrayList<String> answersList) {
+    public StudentSheet(Student student, ArrayList<String> answersList, ArrayList<Integer> gradeList) {
         this.student = student;
         this.answersList = answersList;
+        this.gradeList = gradeList;
     }
 
     public void setApproved(boolean approved) {

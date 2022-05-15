@@ -171,6 +171,12 @@ public class Instructor extends User {
 
                             sheets.get(i).addToGrade(point);
 
+                            for (int k = 0; k < sheets.get(i).getGradeList().size(); k++) {
+                                if (sheets.get(i).getGradeList().get(k) == -1) {
+                                    sheets.get(i).getGradeList().set(k, point);
+                                }
+                            }
+
                             System.out.println();
                             System.out.println();
                         }
@@ -219,13 +225,18 @@ public class Instructor extends User {
 
         if (sheets != null) {
             int totalPoints = 0;
+            int[] grades = new int[sheets.get(0).getGradeList().size()];
             for (int i = 0; i < sheets.size(); i++) {
-                    totalPoints += sheets.get(i).getGrade();
-
+                totalPoints += sheets.get(i).getGrade();
+                for (int j = 0; j < sheets.get(i).getGradeList().size(); j++) {
+                    grades[j] += sheets.get(i).getGradeList().get(j);
+                }
             }
             System.out.println("Average: " + totalPoints / sheets.size());
+
+            for (int i = 0; i < grades.length; i++) {
+                System.out.println(i + "th question average: " + grades[i] / sheets.size());
+            }
         }
-
-
     }
 }
