@@ -22,7 +22,7 @@ public class Instructor extends User {
         Database db = Database.getInstance();
         if (!DoesCourseExists(courseName)) {
             Course course = null;
-            if (db.DoesCourseExists(courseName)){
+            if (db.DoesCourseExists(courseName)) {
                 try {
                     course = db.FindCourse(courseName);
                     course.AddInstructor(this);
@@ -30,13 +30,12 @@ public class Instructor extends User {
                 } catch (CourseNotFoundException e) {
                     System.out.println("Lesson not found");
                 }
-            }
-            else{
+            } else {
                 course = new Course(courseName, this);
             }
             courseList.add(course);
 
-            String fileName = getSchoolID()+"_CourseList.txt";
+            String fileName = getSchoolID() + "_CourseList.txt";
             FileWriter fw = new FileWriter(fileName, true);
             String courseIndex = String.valueOf(db.ReturnOrCreateCourseIndex(course));
             fw.write(courseIndex + "," + this.getSchoolID());
@@ -198,7 +197,35 @@ public class Instructor extends User {
         }
     }
 
-    public void ShowExamStatistics(){
+    public void ShowExamStatistics(String courseName, int examIndex) {
         //TODO: Show exam statistics
+        ArrayList<StudentSheet> sheets = null;
+        List<QuestionAndAnswer> QnA_List = null;
+        Exam exam = null;
+
+        try {
+            Course course = FindCourse(courseName);
+            if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
+                exam = course.GetExam(examIndex - 1);
+                sheets = exam.getStudentSheetList();
+
+            } else {
+                System.out.println("There is no exam by the given index.");
+            }
+        } catch (CourseNotFoundException e) {
+            System.out.println("Course not found");
+        }
+        System.out.println("\n\nRESULTS OF " + courseName);
+
+        if (sheets != null) {
+            int totalPoints = 0;
+            for (int i = 0; i < sheets.size(); i++) {
+                    totalPoints += sheets.get(i).getGrade();
+
+            }
+            System.out.println("Average: " + totalPoints / sheets.size());
+        }
+
+
     }
 }
