@@ -119,13 +119,15 @@ public class Main {
 
                     System.out.println();
 
-                    //Instructors have 5 options as follows:
+                    //Instructors have 6 options as follows:
                     System.out.println("Please choose what you would like to do");
                     System.out.println("1) Add course");
                     System.out.println("2) See and set details of a course");
                     System.out.println("3) Build up an exam");
                     System.out.println("4) Grade or approve exams");
-                    System.out.println("5) Log out");
+                    System.out.println("5) See the average score of the exam");
+                    System.out.println("6) Log out");
+
 
                     //They choose what they want to do
                     int insChoice = scan.nextInt();
@@ -182,7 +184,13 @@ public class Main {
                             instructor.GradeUnevaluatedQuestions(courseName,examIndex);
                         }
                         case 5 -> {
-                            instructor.ShowExamStatistics();
+                            System.out.println("Which course's would you like to see the average grade?");
+                            String courseName = scan.nextLine();
+
+                            System.out.println("Which exam do you want to see: ");
+                            int examIndex = scan.nextInt();scan.nextLine();
+
+                           instructor.ShowExamStatistics(courseName,examIndex);
                         }
                         case 6 -> {
                             System.out.println("Logging out...");
