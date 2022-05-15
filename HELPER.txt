@@ -1,0 +1,14 @@
+We have 2 lists text file at the beginning. One is for storing all users, the other is for storing all lessons:
+
+UserList.txt:
+Instructors and students are stored in the UserList.txt with their schoolID, password, name, surname and lessons in the following manner:
+schoolID, password, name, surname, lessonList.txt
+EXAMPLE: 1234, p1234, John, Roseland, 1234_lessonList.txt
+
+CourseList.txt:
+Instructors and students are stored in the UserList.txt with their schoolID, password, name, surname and lessons in the following manner:
+schoolID, password, name, surname, lessonList.txt
+EXAMPLE: 1234, p1234, John, Roseland, 1234_lessonList.txt
+
+
+

@@ -10,14 +10,14 @@ public abstract class Answer {
     //an instructor is grading it
     public abstract void printResult();
 
-    protected String rightAnswer = "";
+    protected String correctAnswer = "";
 
     public String getRightAnswer() {
-        return rightAnswer;
+        return correctAnswer;
     }
 
-    public void setRightAnswer(String rightAnswer) {
-        this.rightAnswer = rightAnswer;
+    public void setRightAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 }
 
@@ -27,7 +27,7 @@ class ClassicalAnswer extends Answer {
     //A classical answer can be blank or a text might be given
     ClassicalAnswer(String answerText) {
         text = answerText;
-        rightAnswer="undefined";
+        correctAnswer="undefined";
     }
 
     //A classical answer has no part in it that can be shown with the question so here print() function prints nothing
@@ -96,7 +96,7 @@ class TrueFalseAnswer extends Answer {
     //that only T or F can be given as input to here.
     public TrueFalseAnswer(char answer) {
         this.answer = answer;
-        rightAnswer=Character.toString(answer);
+        correctAnswer=Character.toString(answer);
     }
 
     //True/false questions only have 2 choices which is true and false, so this is printed (along with the question)

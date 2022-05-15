@@ -1,12 +1,21 @@
 
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) throws LessonNotFoundException, WrongChoiceException {
+    public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        System.out.println("~Welcome to Exam Management System~");
-        Database database = new Database();
+        Database database = Database.getInstance();
+        try {
+            database.IMPORT();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Cannot initiating system. Exitting...");
+            System.exit(0);
+        } catch (CourseAlreadyExistsException e) {
 
+        }
+        System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
         IMPORT_DEFAULTS(database);
 
@@ -18,7 +27,7 @@ public class Main {
 
             if (Objects.equals(user.getToken(), "student")) {
 
-                //TODO: Show lessons
+                //TODO: Show courses
                 //TODO: Add logging out when structure is formed
 
                 Student student = (Student) user;
@@ -26,8 +35,8 @@ public class Main {
                     boolean willLogOut = false;
 
                     System.out.println("Please choose what you would like to do");
-                    System.out.println("1) Enroll/Unenroll in lessons");
-                    System.out.println("2) List all enrolled lesson details");
+                    System.out.println("1) Enroll/Unenroll in courses");
+                    System.out.println("2) List all enrolled course details");
                     System.out.println("3) See all exam informations");
                     System.out.println("4) Log out");
 
@@ -48,8 +57,8 @@ public class Main {
 
                         }
                         case 2 -> {
-                            //list all enrolled lessons in std class
-                            student.printLessons();
+                            //list all enrolled courses in std class
+                            student.printCourses();
 
                         }
                         case 3 -> {
@@ -66,22 +75,22 @@ public class Main {
                             if (student.ExamCountTotal() > 0) {
                                 student.getExams();
 
-                                System.out.println("Which lesson's exam do you want to take?");
-                                String lessonName = scan.nextLine();
-                                if (student.ExamCountInLesson(lessonName) > 0) {
-                                    Lesson lesson = null;
+                                System.out.println("Which course's exam do you want to take?");
+                                String courseName = scan.nextLine();
+                                if (student.ExamCountInCourse(courseName) > 0) {
+                                    Course course = null;
                                     try {
-                                        lesson = database.FindLesson(lessonName);
-                                    } catch (LessonNotFoundException LNFE) {
-                                        System.out.println("Lesson not found");
+                                        course = database.FindCourse(courseName);
+                                    } catch (CourseNotFoundException LNFE) {
+                                        System.out.println("Course not found");
                                     }
 
-                                    if (lesson != null) {
+                                    if (course != null) {
                                         System.out.println("Which exam do you want to take?");
                                         int examIndex = scan.nextInt();
                                         scan.nextLine();
                                         try {
-                                            Exam exam = lesson.GetExam(examIndex - 1);
+                                            Exam exam = course.GetExam(examIndex - 1);
                                             exam.take(student);
                                         } catch (IndexOutOfBoundsException IOOBE) {
                                             System.out.println("There is no exam in the given index");
@@ -103,17 +112,17 @@ public class Main {
                 Instructor instructor = (Instructor) user;
                 while (true) {
                     boolean willLogOut = false;
-                    //Instructors see their lessons when they first logged in
+                    //Instructors see their courses when they first logged in
                     System.out.println();
-                    instructor.printLessons();
+                    instructor.printCourses();
                     //TODO: Add logging out when structure is formed
 
                     System.out.println();
 
                     //Instructors have 5 options as follows:
                     System.out.println("Please choose what you would like to do");
-                    System.out.println("1) Add lesson");
-                    System.out.println("2) See and set details of a lesson");
+                    System.out.println("1) Add course");
+                    System.out.println("2) See and set details of a course");
                     System.out.println("3) Build up an exam");
                     System.out.println("4) Grade or approve exams");
                     System.out.println("5) Log out");
@@ -124,26 +133,28 @@ public class Main {
 
                     switch (insChoice) {
                         case 1 -> {
-                            System.out.print("Name of the lesson: ");
-                            String lessonName = scan.nextLine();
+                            System.out.print("Name of the course: ");
+                            String courseName = scan.nextLine();
 
-                            //Instructor has a lesson list, he/she creates and ads a lesson to his/her lesson list with given name
+                            //Instructor has a course list, he/she creates and ads a course to his/her course list with given name
                             try {
-                                Lesson lesson = instructor.addAndReturnLesson(lessonName);
-                                database.addLesson(lesson);
-                            } catch (LessonAlreadyExistsException LAEE) {
-                                System.out.println("Lesson already exists");
+                                Course course = instructor.AddAndReturnCourse(courseName);
+                                database.AddCourse(course);
+                            } catch (CourseAlreadyExistsException LAEE) {
+                                System.out.println("Course already exists");
+                            } catch (IOException e) {
+                                System.out.println("Course cannot be added to system right now, please try again later");
                             }
 
                         }
                         case 2 -> {
-                            System.out.print("Name of the lesson: ");
-                            String lessonName = scan.nextLine();
+                            System.out.print("Name of the course: ");
+                            String courseName = scan.nextLine();
                             try {
-                                //This action shows all the lessons, instructor gives and then enables instructor to change their details
-                                instructor.ShowLessonDetails(lessonName);
-                            } catch (LessonNotFoundException LNFE) {
-                                System.out.println("Lesson not found");
+                                //This action shows all the courses, instructor gives and then enables instructor to change their details
+                                instructor.ShowCourseDetails(courseName);
+                            } catch (CourseNotFoundException LNFE) {
+                                System.out.println("Course not found");
                             }
 
                         }
@@ -151,27 +162,29 @@ public class Main {
                             try {
                                 //This action enables instructor to build an exam with desired questions in it
                                 BuildUpExam(instructor);
-                            } catch (LessonNotFoundException LNFE) {
-                                System.out.println("Lesson not found");
+                            } catch (CourseNotFoundException LNFE) {
+                                System.out.println("Course not found");
                             }
 
                         }
                         case 4 -> {
                             //TODO: Grade or approve exams
-                            for (int i = 0; i < instructor.lessonList.size() ; i++) {
-                                instructor.lessonList.get(i).ShowExamDetails();
-                                System.out.println();
+                            for (int i = 0; i < instructor.courseList.size() ; i++) {
+                                instructor.courseList.get(i).ShowExamDetails();
                             }
 
-                            System.out.println("Which lesson's exam do you want to grade: ");
-                            String lessonName = scan.nextLine();
+                            System.out.println("Which course's exam do you want to grade: ");
+                            String courseName = scan.nextLine();
 
                             System.out.println("Which exam do you want to grade: ");
                             int examIndex = scan.nextInt();scan.nextLine();
 
-                            instructor.GradeUnevaluatedQuestions(lessonName,examIndex);
+                            instructor.GradeUnevaluatedQuestions(courseName,examIndex);
                         }
                         case 5 -> {
+                            instructor.ShowExamStatistics();
+                        }
+                        case 6 -> {
                             System.out.println("Logging out...");
                             willLogOut = true;
                         }
@@ -190,16 +203,16 @@ public class Main {
         student.getExams();
     }
 
-    public static void BuildUpExam(Instructor inst) throws LessonNotFoundException {
+    public static void BuildUpExam(Instructor inst) throws CourseNotFoundException {
         Scanner scan = new Scanner(System.in);
-        //Lessons have exams so we get here a lesson name to add that exam to that lesson
-        System.out.println("Please enter the name of the lesson that you want to add an exam to:");
-        String lessonName = scan.nextLine();
+        //Courses have exams so we get here a course name to add that exam to that course
+        System.out.println("Please enter the name of the course that you want to add an exam to:");
+        String courseName = scan.nextLine();
 
-        Lesson lesson = null;
+        Course course = null;
         Exam exam = new Exam();
 
-        lesson = inst.FindLesson(lessonName);
+        course = inst.FindCourse(courseName);
         boolean isDone = false;
         boolean isCancel = false;
         int examPointTotal = 0;
@@ -267,7 +280,7 @@ public class Main {
                     //Instructor chooses the right one among all choices:
                     char choiceCode;
                     while (true) {
-                        System.out.println("Which choice is right?");
+                        System.out.println("Which choice is correct?");
                         choiceCode = scan.nextLine().charAt(0);
 
                         if ((int) choiceCode > (64 + choiceCount)) {
@@ -334,7 +347,7 @@ public class Main {
 
             exam.setPoint(examPointTotal);
             try {
-                lesson.AddExam(exam);
+                course.AddExam(exam);
                 System.out.println("Exam is successfully added");
             } catch (Exception e) {
                 System.out.println("An error occurred while adding the exam, please try again later.");
@@ -372,20 +385,36 @@ public class Main {
                         break;
                     }
 
-                    System.out.println("School ID: ");
-                    int ID = scan.nextInt();
-                    scan.nextLine();
-                    System.out.println("Password: ");
-                    String password = scan.nextLine();
-                    System.out.println("Name: ");
-                    String name = scan.nextLine();
-                    System.out.println("Surname: ");
-                    String surname = scan.nextLine();
+                    if (signingUpChoice == 1 || signingUpChoice == 2){
+                        int ID;
+                        while(true){
+                            System.out.println("School ID: ");
+                            scan.nextLine();
+                            try{
+                                ID = scan.nextInt();
+                                scan.nextLine();
+                                break;
+                            }
+                            catch (InputMismatchException IME){
+                                System.out.println("ID should be a number, please try again.");
+                            }
+                        }
 
-                    switch (signingUpChoice) {
-                        case 1 -> db.registerInstructor(name, surname, ID, password);
-                        case 2 -> db.registerStudent(name, surname, ID, password);
+                        System.out.println("Password: ");
+                        String password = scan.nextLine();
+                        System.out.println("Name: ");
+                        String name = scan.nextLine();
+                        System.out.println("Surname: ");
+                        String surname = scan.nextLine();
+
+                        switch (signingUpChoice) {
+                            case 1 -> db.registerInstructor(name, surname, ID, password);
+                            case 2 -> db.registerStudent(name, surname, ID, password);
+                        }
                     }
+                    else System.out.println("Invalid choice.");
+
+
                 }
                 case 2 -> {
                     if (db.userList.size() == 0) {
@@ -401,7 +430,7 @@ public class Main {
                         user = db.logIn(ID, password);
                         isSignedIn = true;
                     } catch (WrongIDException WIex) {
-                        System.out.println("Email Not Found");
+                        System.out.println("ID Not Found");
                     } catch (WrongPasswordException WPex) {
                         System.out.println("Wrong Password");
                     } catch (NullPointerException nullEx) {
@@ -441,31 +470,31 @@ public class Main {
     public static void enrollUnroll(Database database, Student student) throws WrongChoiceException {
         Scanner scan = new Scanner(System.in);
 
-        //Students can enroll and unenroll to a lesson using "enroll" or "unenroll" input
-        System.out.println("Do you want to enroll or unenroll in lessons?");
+        //Students can enroll and unenroll to a course using "enroll" or "unenroll" input
+        System.out.println("Do you want to enroll or unenroll in courses?");
         String enrollChoice = scan.nextLine();
 
         if (enrollChoice.equals("enroll")) {// enroll according to name in list
-            System.out.println("You can enroll in these lessons");
-            database.showLessons();//list all lessons in
+            System.out.println("You can enroll in these courses");
+            database.showCourses();//list all courses in
 
-            System.out.println("Please choose one of the lessons and write its name to enroll");
-            String choosenLesson = scan.nextLine();
+            System.out.println("Please choose one of the courses and write its name to enroll");
+            String choosenCourse = scan.nextLine();
             try {
-                Lesson foundLesson = database.FindLesson(choosenLesson);
-                student.enrollLesson(foundLesson);
-            } catch (LessonNotFoundException LNFE) {
-                System.out.println("Lesson not found");
+                Course foundCourse = database.FindCourse(choosenCourse);
+                student.enrollCourse(foundCourse);
+            } catch (CourseNotFoundException LNFE) {
+                System.out.println("Course not found");
             }
         } else if (enrollChoice.equals("unenroll")) { // unenroll according to name in list
-            System.out.println("You can unenroll from your lessons");
-            student.printLessons();
-            String choosenLesson = scan.nextLine();
+            System.out.println("You can unenroll from your courses");
+            student.printCourses();
+            String choosenCourse = scan.nextLine();
             try {
-                Lesson foundLesson = student.FindLesson(choosenLesson);
-                student.unenrollLesson(foundLesson);
-            } catch (LessonNotFoundException LNFE) {
-                System.out.println("Lesson not found");
+                Course foundCourse = student.FindCourse(choosenCourse);
+                student.unenrollCourse(foundCourse);
+            } catch (CourseNotFoundException LNFE) {
+                System.out.println("Course not found");
             }
         } else
             //If an input is given other than enroll or unenroll, system throws an error
@@ -480,27 +509,35 @@ public class Main {
 
 
 
-    //THIS METHOD IS FOR HELPING US DEBUG THE PROCESS: It creates default users, lessons, exams etc. to see how changes affect.
+    //THIS METHOD IS FOR HELPING US DEBUG THE PROCESS: It creates default users, courses, exams etc. to see how changes affect.
 
     public static void IMPORT_DEFAULTS(Database db){
-        //Two default users: Instructor Johnny and student Gerard
-        Instructor instructorJ= new Instructor("Johnny", "Black", 1,"1");
-        Student studentG = new Student("Gerard", "McCarthy", 2,"2");
+        //Two default users: Instructor Johnny and students Gerard, Alice and Cheryll
+        db.registerInstructor("John", "Roseland", 1,"1");
+        db.registerStudent("Gerard", "Greene", 2,"2");
+        db.registerStudent("Alice", "King", 3,"3");
+        db.registerStudent("Cheryll", "Basket", 4,"4");
 
-        db.userList.add(instructorJ);
-        db.userList.add(studentG);
+        Instructor instructorJ = (Instructor) db.userList.get(0);
+        Student studentG = (Student) db.userList.get(1);
+        Student studentA = (Student) db.userList.get(2);
+        Student studentC = (Student) db.userList.get(3);
 
-        //Johnny gives lesson BIO 101.
+        //Johnny gives course BIO 101.
         try {
-            db.addLesson(instructorJ.addAndReturnLesson("BIO 101"));
-        } catch (LessonAlreadyExistsException e) {
+            db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"));
+        } catch (CourseAlreadyExistsException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Course cannot be added to system right now, please try again later");
         }
 
-        //Gerard takes lesson BIO 101.
+        //Gerard, Alice and Cheryll takes course BIO 101.
         try {
-            studentG.enrollLesson(db.FindLesson("BIO 101"));
-        } catch (LessonNotFoundException e) {
+            studentG.enrollCourse(db.FindCourse("BIO 101"));
+            studentA.enrollCourse(db.FindCourse("BIO 101"));
+            studentC.enrollCourse(db.FindCourse("BIO 101"));
+        } catch (CourseNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -542,8 +579,8 @@ public class Main {
         exam.SetDate(new int[]{6, 6, 2022});
 
         try {
-            db.FindLesson("BIO 101").AddExam(exam);
-        } catch (LessonNotFoundException e) {
+            db.FindCourse("BIO 101").AddExam(exam);
+        } catch (CourseNotFoundException e) {
             e.printStackTrace();
         }
 

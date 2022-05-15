@@ -8,6 +8,8 @@ public class StudentSheet {
     private final Student student;
     private final ArrayList<String> answersList;
     private int grade;
+
+    //Students will be able to see their grade only when their grade is approved
     private boolean approved = false;
 
     public String getAnswer(int index) {
@@ -37,6 +39,10 @@ public class StudentSheet {
 
     public void setApproved(boolean approved) {
         this.approved = approved;
+    }
+
+    public boolean isApproved() {
+        return approved;
     }
 
     public ArrayList<String> getAnswersList() {

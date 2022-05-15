@@ -136,5 +136,14 @@ public class Exam {
         System.out.println(notEvaluatedPointsCount + " points will not be evaluated directly.");
     }
 
+    public boolean AreAllSheetsApproved(){
+        for (StudentSheet sheet : studentSheetList){
+            if (!sheet.isApproved()){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 }

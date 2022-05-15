@@ -39,49 +39,49 @@ public abstract class User {
         return surname;
     }
 
-    //User has a lessonList to store all lessons that student is taking
-    protected final ArrayList<Lesson> lessonList = new ArrayList<>();
+    //User has a courseList to store all courses that student is taking
+    protected final ArrayList<Course> courseList = new ArrayList<>();
 
 
-    public void printLessons() {
-        //Unless the lessonList's size is 0, all lessons in lessonList is printed out
-        if (lessonList.size() != 0) {
-            System.out.println("Those are your lessons:");
-            for (Lesson lesson : lessonList) {
-                System.out.println(lesson.getName());
+    public void printCourses() {
+        //Unless the courseList's size is 0, all courses in courseList is printed out
+        if (courseList.size() != 0) {
+            System.out.println("Those are your courses:");
+            for (Course course : courseList) {
+                System.out.println(course.getName());
             }
         } else {
-            System.out.println("You currently have no lessons.");
+            System.out.println("You currently have no courses.");
         }
     }
 
-    //This function is used for searching a particular lesson using its name
-    public Lesson FindLesson(String lessonName) throws LessonNotFoundException {
-        for (Lesson lesson : lessonList) {
-            if (Objects.equals(lesson.getName(), lessonName)) {
-                return lesson;
+    //This function is used for searching a particular course using its name
+    public Course FindCourse(String courseName) throws CourseNotFoundException {
+        for (Course course : courseList) {
+            if (Objects.equals(course.getName(), courseName)) {
+                return course;
             }
         }
-        throw new LessonNotFoundException();
+        throw new CourseNotFoundException();
     }
 
 
     //EXPERIMENTAL ADDITON
-    public int ExamCountInLesson(String lessonName){
+    public int ExamCountInCourse(String courseName){
         try {
-            Lesson lesson = FindLesson(lessonName);
-            return lesson.ExamCount();
+            Course course = FindCourse(courseName);
+            return course.ExamCount();
         }
-        catch (LessonNotFoundException LNFE){
-            System.out.println("Lesson not found");
+        catch (CourseNotFoundException LNFE){
+            System.out.println("Course not found");
         }
         return 0;
     }
 
     public int ExamCountTotal(){
         int count = 0;
-        for (Lesson lesson : lessonList) {
-            count += lesson.ExamCount();
+        for (Course course : courseList) {
+            count += course.ExamCount();
         }
         return count;
     }

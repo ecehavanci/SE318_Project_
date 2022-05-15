@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -7,32 +9,47 @@ public class Student extends User {
         token = "student";
     }
 
-    public void enrollLesson(Lesson lesson) {
-        //When a student is enrolled a lesson, this lesson is added to the lessonList of that student who enrolled the lesson
-        lessonList.add(lesson);
+    public void enrollCourse(Course course) {
+        //When a student is enrolled a course, this course is added to the courseList of that student who enrolled the course
+        courseList.add(course);
+
+        //----------DATABASE ADDITION----------
+        Database db = Database.getInstance();
+        String fileName = getSchoolID()+"_CourseList.txt";
+
+        try {
+            FileWriter fw = new FileWriter(fileName, true);
+            String courseIndex = String.valueOf(db.ReturnOrCreateCourseIndex(course));
+            fw.write(courseIndex);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //----------DATABASE ADDITION----------
+
         System.out.println("Successfully enrolled");
 
     }
 
-    public void unenrollLesson(Lesson lesson) {
-        //When a student is unenrolled a lesson, this lesson is removed from the lessonList of that student who unenrolled from the lesson
-        lessonList.remove(lesson);
+    public void unenrollCourse(Course course) {
+        //When a student is unenrolled a course, this course is removed from the courseList of that student who unenrolled from the course
+        courseList.remove(course);
         System.out.println("Successfully unenrolled");
     }
 
     public void getExams() {
         System.out.println("Exams that you have: ");
 
-        for (int i = 0; i < lessonList.size(); i++) {
-            int exams = lessonList.get(i).ExamCount();
+        for (int i = 0; i < courseList.size(); i++) {
+            int exams = courseList.get(i).ExamCount();
 
             if (exams == 0) {
                 System.out.println("Don't have any exams");
             }
 
             for (int j = 0; j < exams; j++) {
-                Lesson lesson = lessonList.get(i);
-                lesson.ShowExamDetails();
+                Course course = courseList.get(i);
+                course.ShowExamDetails();
             }
         }
     }
