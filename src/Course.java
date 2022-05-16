@@ -46,21 +46,21 @@ public class Course {
 
     public void AddInstructor(Instructor instructor) {
         instructors.add(instructor);
-        Database db = Database.getInstance();
+        /*Database db = Database.getInstance();
         try {
             int userIndex = db.ReturnUserIndex(instructor);
             if (userIndex == -1){
                 System.out.println("Instructor not registered");
             }
             else{
-                FileWriter fr = new FileWriter(name + "_instructorList.txt", true);
-                fr.write(userIndex);
+                FileWriter fr = new FileWriter(name + "_InstructorList.txt", true);
+                fr.write(String.valueOf(instructor.getSchoolID()));
                 fr.close();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void PrintInstructors() {

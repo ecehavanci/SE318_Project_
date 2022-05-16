@@ -1,26 +1,26 @@
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Scanner scan = new Scanner(System.in);
         Database database = Database.getInstance();
+
         try {
             database.IMPORT();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Cannot initiating system. Exitting...");
             System.exit(0);
-        } catch (CourseAlreadyExistsException e) {
-            //No problem in importing, of course it will exist at some point, this exception is for catching in-system errors.
-        } catch (CourseNotFoundException e) {
-            e.printStackTrace();
         }
 
         System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
-        IMPORT_DEFAULTS();
+        //IMPORT_DEFAULTS();
 
 
         while (true) {
@@ -148,12 +148,12 @@ public class Main {
                             //Instructor has a course list, he/she creates and ads a course to his/her course list with given name
                             try {
                                 Course course = instructor.AddAndReturnCourse(courseName);
-                                database.AddCourse(course);
+                                database.AddCourse(course, instructor);
                             } catch (CourseAlreadyExistsException LAEE) {
                                 System.out.println("Course already exists");
-                            } catch (IOException e) {
+                            } /*catch (IOException e) {
                                 System.out.println("Course cannot be added to system right now, please try again later");
-                            }
+                            }*/
 
                         }
                         case 2 -> {
@@ -541,15 +541,15 @@ public class Main {
         Student studentA = (Student) db.userList.get(3);
         Student studentC = (Student) db.userList.get(4);
 
-        //Johnny gives course BIO 101.
+        //John gives course BIO 101.
         try {
-            db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"));
-            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"));
-        } catch (CourseAlreadyExistsException e) {
+            db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"), instructorJ);
+            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"), instructorW);
+        } catch (CourseAlreadyExistsException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } /*catch (IOException e) {
             System.out.println("Course cannot be added to system right now, please try again later");
-        }
+        }*/
 
         //Gerard, Alice and Cheryll takes course BIO 101.
         try {

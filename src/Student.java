@@ -15,12 +15,12 @@ public class Student extends User {
 
         //----------DATABASE ADDITION----------
         Database db = Database.getInstance();
+        System.out.println(TextColours.blue + getSchoolID() + TextColours.reset);
         String fileName = getSchoolID()+"_CourseList.txt";
 
         try {
             FileWriter fw = new FileWriter(fileName, true);
-            String courseIndex = String.valueOf(db.ReturnOrCreateCourseIndex(course));
-            fw.write(courseIndex);
+            fw.write(course.getName());
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();

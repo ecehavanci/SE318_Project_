@@ -19,6 +19,7 @@ public class Instructor extends User {
 
     //This function adds and returns the course to instructor's local courseList so it can be added to the courseList in the database
     public Course AddAndReturnCourse(String courseName) throws CourseAlreadyExistsException, IOException {
+        System.out.println(TextColours.blue + "Adding and returning course" + TextColours.reset);
         Database db = Database.getInstance();
         if (!DoesCourseExists(courseName)) {
             Course course = null;
@@ -28,18 +29,27 @@ public class Instructor extends User {
                     course.AddInstructor(this);
 
                 } catch (CourseNotFoundException e) {
-                    System.out.println("Lesson not found");
+                    System.out.println(TextColours.yellow + "Course not found" + TextColours.reset);
                 }
             } else {
                 course = new Course(courseName, this);
             }
-            courseList.add(course);
+            if (course!=null){
+               if (!db.DoesCourseExistInStoringFiles(courseName,getSchoolID() + "_CourseList.txt")){
+                    String fileName = getSchoolID() + "_CourseList.txt";
+                    FileWriter fw = new FileWriter(fileName, true);
+                    fw.write(course.getName() + System.getProperty("line.separator"));
+                    fw.close();
 
-            String fileName = getSchoolID() + "_CourseList.txt";
-            FileWriter fw = new FileWriter(fileName, true);
-            String courseIndex = String.valueOf(db.ReturnOrCreateCourseIndex(course));
-            fw.write(courseIndex + "," + this.getSchoolID());
-            fw.close();
+                    /*String fileName2 = courseName + "_InstructorList.txt";
+                    FileWriter fw2 = new FileWriter(fileName2, true);
+                    System.out.println(getSchoolID());
+                    fw2.write(getSchoolID() + System.getProperty("line.separator"));
+                    fw2.close();*/
+                }
+
+                courseList.add(course);
+            }
 
             return course;
         } else {
@@ -138,7 +148,8 @@ public class Instructor extends User {
                 System.out.println("There is no exam by the given index.");
             }
         } catch (CourseNotFoundException e) {
-            System.out.println("Course not found");
+            System.out.println(TextColours.yellow + "Course not found" + TextColours.reset);
+
         }
 
 
@@ -219,7 +230,7 @@ public class Instructor extends User {
                 System.out.println("There is no exam by the given index.");
             }
         } catch (CourseNotFoundException e) {
-            System.out.println("Course not found");
+            System.out.println(TextColours.yellow + "Lesson not found" + TextColours.reset);
         }
         System.out.println("\n\nRESULTS OF " + courseName);
 

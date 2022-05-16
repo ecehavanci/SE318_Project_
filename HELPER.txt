@@ -19,7 +19,7 @@ Exams have QuestionAndAnswers
 
 STORING A PARTICULAR USER'S COURSES:
 System allows us to find a lesson only from the name, so here courses are stored only with their names. So to courses to be stored in the
-general courses list with full information (thier name, instructorsText, examsText, etc.) is enough.
+general courses list with full information (their name, instructorsText, examsText) is enough.
 
 
 
