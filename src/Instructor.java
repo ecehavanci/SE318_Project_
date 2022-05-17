@@ -1,5 +1,6 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Instructor extends User {
@@ -34,8 +35,8 @@ public class Instructor extends User {
             } else {
                 course = new Course(courseName, this);
             }
-            if (course!=null){
-               if (!db.DoesCourseExistInStoringFiles(courseName,getSchoolID() + "_CourseList.txt")){
+            if (course != null) {
+                if (!db.DoesCourseExistInStoringFiles(courseName, getSchoolID() + "_CourseList.txt")) {
                     String fileName = getSchoolID() + "_CourseList.txt";
                     FileWriter fw = new FileWriter(fileName, true);
                     fw.write(course.getName() + System.getProperty("line.separator"));
@@ -69,12 +70,25 @@ public class Instructor extends User {
         Scanner scan = new Scanner(System.in);
         String yesNoChoice = scan.nextLine().toUpperCase(Locale.ROOT);
         if (yesNoChoice.equals("YES")) {
-            SetCourseDetails(course);
+            try {
+                SetCourseDetails(course);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    public Course FindCourse(String courseName) throws CourseNotFoundException {
+        for (Course c : courseList) {
+            if (Objects.equals(c.getName(), courseName)) {
+                return c;
+            }
+        }
+        throw new CourseNotFoundException();
+    }
+
     //This function is for changing details (name, exams, exam dates, exam type, etc.) of the given course
-    private void SetCourseDetails(Course course) {
+    private void SetCourseDetails(Course course) throws IOException {
         Scanner scan = new Scanner(System.in);
         System.out.println("Please choose what would you like to do: ");
         System.out.println("1) Edit the name of the course");
@@ -84,8 +98,160 @@ public class Instructor extends User {
         scan.nextLine();
         switch (detailChoice) {
             case 1 -> {
+                //TextColours.writeRed("1");
                 System.out.println("What is the new name of the course");
-                course.setName(scan.nextLine());
+
+                String courseName = scan.nextLine();
+                String oldCourseName=course.getName();
+
+
+                //CHANGING THE COURSE NAME FOR THE LIST THAT STORES ALL COURSES IN DATABASE: CourseList.txt
+                BufferedReader reader = new BufferedReader(new FileReader("CourseList.txt"));
+                ArrayList<String> allLines = new ArrayList<>();
+                String line = "";
+                while((line=reader.readLine())!=null){
+                    allLines.add(line);
+                }
+                reader.close();
+
+                System.out.println("HERE ARE LINES: " + allLines);
+
+                for (int i = 0 ; i< allLines.size(); i++){
+                    if (allLines.get(i).equals(course.getName())){
+                        TextColours.writeBlue("FOUND: " + course.getName() + "!");
+                        TextColours.writeBlue("Replacing " + course.getName() + " with " + courseName + " in temporary storing area...");
+                        allLines.set(i, courseName);
+                    }
+                }
+
+                FileWriter courseWriter = new FileWriter("CourseList.txt");
+                for (String replacingLine : allLines){
+                    courseWriter.write(replacingLine + System.getProperty("line.separator"));
+                }
+                courseWriter.close();
+
+                course.setName(courseName);
+                //CHANGING THE COURSE NAME IN INSTRUCTORS DATABASE RECORDS: schoolID_CourseList.txt
+                FileWriter localCourseWriter = new FileWriter(getName()+"_CourseList.txt");
+                for (Course replacingLine : courseList){
+                    localCourseWriter.write(replacingLine.getName() + System.getProperty("line.separator"));
+                }
+                localCourseWriter.close();
+
+                File newCourseFile = new File(courseName + "_ExamsList.txt");
+
+                if (newCourseFile.createNewFile()){
+                    TextColours.writeBlue("New course file successfully created: " + newCourseFile);
+                    FileWriter newCourseWriter = new FileWriter(newCourseFile, true);
+                    //newCourseWriter.write(courseName);
+                    //newCourseWriter.close();
+
+                    File oldCourseFile = new File(oldCourseName + "_ExamsList.txt");
+
+                    BufferedReader examReader = new BufferedReader(new FileReader(oldCourseFile));
+                    ArrayList<String> exams = new ArrayList<>();
+                    String exam = "";
+                    while((exam=examReader.readLine())!=null){
+                        exams.add(exam);
+                    }
+                    System.out.println("HERE ARE EXAMS: " + exams);
+                    examReader.close();
+
+                    for (String e : exams){
+                        newCourseWriter.write(e);
+                    }
+                    newCourseWriter.close();
+                }
+                else{
+                    TextColours.writeBlue("Course file creating failed for file: " + newCourseFile.getName());
+                }
+
+
+
+
+
+                //Files.delete(Paths.get(oldCourseFile.getPath()));
+
+                /*if (oldCourseFile.delete()){
+                    TextColours.writeBlue("Old course file successfully deleted.");
+                }
+                else{
+                    TextColours.writeBlue("Course file deleting failed for file: " + oldCourseFile.getName());
+                }*/
+
+
+
+
+
+                //deleting old courseName_ExamList and creating new one
+
+
+                /*File dFile = new File(courseName + "_ExamsList.txt");
+
+                TextColours.writeRed("2");
+
+                if (dFile.createNewFile()) {
+                    System.out.println("File created with name: " + dFile);
+                } else {
+                    System.out.println("Failed creating file: " + dFile);
+                }
+
+                File sFile = new File(course.getName() + "_ExamsList.txt");
+                FileReader fin = new FileReader(sFile);
+                FileWriter fout = new FileWriter(dFile, true);
+                int c;
+                while ((c = fin.read()) != -1) {
+                    fout.write(c);
+                }
+                TextColours.writeRed("3");
+
+                if (sFile.delete()) {
+                    System.out.println("File deleted with name: " + sFile);
+                } else {
+                    System.out.println("Failed deleting file: " + sFile);
+                }
+
+                TextColours.writeRed("4");
+
+                fin.close();
+                fout.close();
+
+                //Reading and storing kine by line
+                File mainCourseFile = new File("CourseList.txt");
+                FileReader mainCourseFileReader = new FileReader(mainCourseFile);
+                TextColours.writeRed("5");
+
+                BufferedReader courseReader = new BufferedReader(mainCourseFileReader);
+                ArrayList<String[]> allData = new ArrayList<>();
+                String data;
+                while ((data = courseReader.readLine()) != null) {
+                    String[] dataArray = data.split(",");
+                    //System.out.println(Arrays.toString(dataArray));
+                    allData.add(dataArray);
+                }
+
+                for (int i = 0; i < allData.size(); i++) {
+                    System.out.println(Arrays.toString(allData.get(i)));
+                }
+                TextColours.writeRed("6");
+
+
+                File tempFile = new File("TEMP.txt");
+                tempFile.createNewFile();
+                FileWriter courseWriter = new FileWriter(tempFile, true);
+
+                for (String[] line : allData) {
+                    courseWriter.write(line[0] + "," + line[1]);
+                }
+                TextColours.writeRed("7");
+
+                mainCourseFile.delete();
+                tempFile.renameTo(new File("CourseList.txt"));
+
+                courseReader.close();
+                mainCourseFileReader.close();
+                TextColours.writeRed("8");*/
+
             }
             case 2 -> {
                 if (course.ExamCount() > 0) {
@@ -141,8 +307,8 @@ public class Instructor extends User {
             Course course = FindCourse(courseName);
             if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
                 exam = course.GetExam(examIndex - 1);
-                QnA_List = exam.getQnA_List();
-                sheets = exam.getStudentSheetList();
+                QnA_List = exam.GetQnA_List();
+                sheets = exam.GetStudentSheetList();
 
             } else {
                 System.out.println("There is no exam by the given index.");
@@ -224,7 +390,7 @@ public class Instructor extends User {
             Course course = FindCourse(courseName);
             if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
                 exam = course.GetExam(examIndex - 1);
-                sheets = exam.getStudentSheetList();
+                sheets = exam.GetStudentSheetList();
 
             } else {
                 System.out.println("There is no exam by the given index.");

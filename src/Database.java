@@ -92,7 +92,7 @@ public class Database {
         return null;
     }
 
-    public void AddCourse(Course course, Instructor instructor) throws IOException {
+    public void AddCourse(Course course) throws IOException {
         System.out.println("Adding course...");
         if (!DoesCourseExists(course.getName())) {
             if (!DoesCourseExistInStoringFiles(course.getName())) {
@@ -105,7 +105,7 @@ public class Database {
                 //File instructorListText = new File(course.getName() + "_InstructorList.txt");
                 //instructorListText.createNewFile();
 
-                fw.write(course.getName() + "," /*+ instructorListText.getName() + ","*/ + examListText.getName() + System.getProperty("line.separator"));
+                fw.write(course.getName() /*+ "," + instructorListText.getName() + "," + examListText.getName()*/ + System.getProperty("line.separator"));
 
                 fw.close();
             }
@@ -161,7 +161,7 @@ public class Database {
             if (dataArray[0].equals("instructor")) {
                 System.out.println(TextColours.blue + "Importing an instructor..." + TextColours.reset);
 
-                int ID = Integer.parseInt(dataArray[2]);
+                int ID = Integer.parseInt(dataArray[1]);
 
                 //Here an instructor is created with given data in UserList.txt line by line
                 userList.add(new Instructor(dataArray[3], dataArray[4], ID, dataArray[2]));

@@ -4,32 +4,34 @@ import java.time.format.FormatStyle;
 import java.util.*;
 
 public class Exam {
+    private int ID; //This is for text-database purposes
     private String type;//midterm, final, quiz etc.
     private LocalDate date;//the date of the exam
     private final ArrayList<StudentSheet> studentSheetList = new ArrayList<>();
     private int point;
-
     private final List<QuestionAndAnswer> QnA_List = new ArrayList<>();
 
-    public List<QuestionAndAnswer> getQnA_List() {
+    public void SetID(int ID) {
+        this.ID = ID;
+    }
+
+    public int GetID() {
+        return ID;
+    }
+
+    public List<QuestionAndAnswer> GetQnA_List() {
         return QnA_List;
     }
 
-    public ArrayList<StudentSheet> getStudentSheetList() {
+    public ArrayList<StudentSheet> GetStudentSheetList() {
         return studentSheetList;
     }
 
-    //Every exam have a list of questions and answers, questions and answers are bound together using QuestionAndAnswer class
-    public void AddQuestion(String question, Answer answer, int point, boolean evaluatedDirectly) {
-        QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer, point, evaluatedDirectly);
-        QnA_List.add(QnA);
-    }
-
-    public void setPoint(int point) {
+    public void SetPoint(int point) {
         this.point = point;
     }
 
-    public int getPoint() {
+    public int GetPoint() {
         return point;
     }
 
@@ -58,6 +60,15 @@ public class Exam {
     public String GetLongDate() {
         return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
     }
+
+
+    //Every exam have a list of questions and answers, questions and answers are bound together using QuestionAndAnswer class
+    public void AddQuestion(String question, Answer answer, int point, boolean evaluatedDirectly) {
+        QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer, point, evaluatedDirectly);
+        QnA_List.add(QnA);
+    }
+
+
 
     public void PrintQuestions() {
         for (QuestionAndAnswer QnA : QnA_List) {

@@ -14,7 +14,7 @@ public class Main {
             database.IMPORT();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Cannot initiating system. Exitting...");
+            System.out.println("Cannot initiate system. Exitting...");
             System.exit(0);
         }
 
@@ -148,7 +148,7 @@ public class Main {
                             //Instructor has a course list, he/she creates and ads a course to his/her course list with given name
                             try {
                                 Course course = instructor.AddAndReturnCourse(courseName);
-                                database.AddCourse(course, instructor);
+                                database.AddCourse(course);
                             } catch (CourseAlreadyExistsException LAEE) {
                                 System.out.println("Course already exists");
                             } /*catch (IOException e) {
@@ -238,7 +238,7 @@ public class Main {
             System.out.println("1) Classical type question (open ended)");
             System.out.println("2) Multiple choice question");
             System.out.println("3) True/False question");
-            System.out.println("4) Done exam building");
+            System.out.println("4) Finish exam building");
             System.out.println("5) Cancel exam building");
 
             int examChoice = scan.nextInt();
@@ -360,7 +360,7 @@ public class Main {
             String examType = scan.nextLine();
             exam.EditType(examType);
 
-            exam.setPoint(examPointTotal);
+            exam.SetPoint(examPointTotal);
             try {
                 course.AddExam(exam);
                 System.out.println("Exam is successfully added");
@@ -543,8 +543,8 @@ public class Main {
 
         //John gives course BIO 101.
         try {
-            db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"), instructorJ);
-            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"), instructorW);
+            db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"));
+            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"));
         } catch (CourseAlreadyExistsException | IOException e) {
             e.printStackTrace();
         } /*catch (IOException e) {
@@ -593,7 +593,7 @@ public class Main {
         Answer classicalAnswer2 = new ClassicalAnswer("");
         exam.AddQuestion(classicalQuestion2,classicalAnswer2,45,false);
 
-        exam.setPoint(100);
+        exam.SetPoint(100);
         exam.EditType("Midterm");
         exam.SetDate(new int[]{6, 6, 2022});
 
@@ -601,8 +601,9 @@ public class Main {
             db.FindCourse("BIO 101").AddExam(exam);
         } catch (CourseNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
 
 
     }

@@ -10,6 +10,8 @@ Instructors and students are stored in the UserList.txt with their schoolID, pas
 schoolID, password, name, surname, lessonList.txt
 EXAMPLE: 1234, p1234, John, Roseland, 1234_lessonList.txt
 
+Exams stored in the followint manner:
+examType,examDate,examPoint,courseName_SheetList.txt,courseName_QnA_List.txt
 
 HIERARCHY:
 Hieararcy is as follows:

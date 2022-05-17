@@ -1,14 +1,15 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class Course {
-    private ArrayList <Instructor> instructors = new ArrayList<>();
+    private ArrayList<Instructor> instructors = new ArrayList<>();
     private String name;
     private final ArrayList<Exam> examList = new ArrayList<>();
 
-    //A lesson has an instructor and a name
+    //A lesson has a name and instructors
     public Course(String name, Instructor instructor) {
         this.name = name;
         instructors.add(instructor);
@@ -18,13 +19,18 @@ public class Course {
         this.name = name;
     }
 
-    public Instructor getFirstInstructor(){
+    public Instructor GetFirstInstructor() {
         return instructors.get(0);
     }
 
 
-    public void AddExam(Exam exam) {
+    public void AddExam(Exam exam) throws IOException {
+        exam.SetID(examList.size());
+        TextColours.writeBlue("adding exam");
+        FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
+        examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetFullDate() + "," + exam.GetPoint() + "," + name + "_SheetList.txt" + "," + name + "_QnA_List.txt" + System.getProperty("line.separator"));
         examList.add(exam);
+        examWriter.close();
     }
 
     public Exam GetExam(int index) {
@@ -65,13 +71,12 @@ public class Course {
 
     public void PrintInstructors() {
         int counter = 0;
-        for (Instructor instructor : instructors){
+        for (Instructor instructor : instructors) {
             counter++;
             System.out.print(instructor.getName() + " " + instructor.getSurname());
-            if (counter<instructors.size()){
+            if (counter < instructors.size()) {
                 System.out.print(", ");
-            }
-            else{
+            } else {
                 System.out.println();
             }
         }
