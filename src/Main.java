@@ -355,6 +355,14 @@ public class Main {
             System.out.print("Please enter a date: ");
             SetDate(exam);
 
+            System.out.print("Please enter the hour: ");
+            int hour = scan.nextInt();
+
+            System.out.print("Please enter the minute: ");
+            int minute = scan.nextInt();
+
+            exam.SetTime(hour,minute);
+
             //The attribute could be final, quiz, midterm, etc.
             System.out.print("Please enter the type of the exam: ");
             String examType = scan.nextLine();

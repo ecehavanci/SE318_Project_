@@ -43,6 +43,9 @@ public class Exam {
     public void SetDate(int[] dayMonthYear) {
         date = LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
     }
+    public void SetTime(int hour, int minute) {
+        date.atTime(hour, minute);
+    }
 
     //Exam type can be edited (for example can be set as midterm but then changed to a quiz)
     public void EditType(String type) {
