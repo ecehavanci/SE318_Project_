@@ -132,7 +132,7 @@ public class Instructor extends User {
 
                 course.setName(courseName);
                 //CHANGING THE COURSE NAME IN INSTRUCTORS DATABASE RECORDS: schoolID_CourseList.txt
-                FileWriter localCourseWriter = new FileWriter(getName()+"_CourseList.txt");
+                FileWriter localCourseWriter = new FileWriter(getSchoolID()+"_CourseList.txt");
                 for (Course replacingLine : courseList){
                     localCourseWriter.write(replacingLine.getName() + System.getProperty("line.separator"));
                 }

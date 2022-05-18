@@ -32,9 +32,9 @@ public class Database {
                 FileWriter fw = new FileWriter(userListText, true);
 
                 File CourseListText = new File(schoolID + "_CourseList.txt");
-                CourseListText.createNewFile();
+                System.out.println(CourseListText.createNewFile());
 
-                fw.write("instructor," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + System.getProperty("line.separator"));
+                fw.write("instructor," + schoolID + "," + password + "," + name + "," + surname + System.getProperty("line.separator"));
                 fw.close();
             }
             User newUser = new Instructor(name, surname, schoolID, password);
@@ -59,7 +59,8 @@ public class Database {
                 File CourseListText = new File(schoolID + "_CourseList.txt");
                 CourseListText.createNewFile();
 
-                fw.write("student," + schoolID + "," + password + "," + name + "," + surname + "," + CourseListText.getName() + System.getProperty("line.separator"));
+
+                fw.write("student," + schoolID + "," + password + "," + name + "," + surname + System.getProperty("line.separator"));
                 fw.close();
             }
             User newUser = new Student(name, surname, schoolID, password);
@@ -176,18 +177,42 @@ public class Database {
                     TextColours.writeRed("User not found");
                 }
                 if (instructor != null) {
-                    //dataArray[5] is the data which points to a text file that all names of courses instructor is giving is stored
-                    File usersCourseList = new File(dataArray[5]);
+                    //dataArray[1] + "_CourseList" is the data which points to a text file that all names of courses instructor is giving is stored
+                    String fileName = ID + "_CourseList.txt";
+                    System.out.println("ID: " + ID);
+                    File usersCourseList = new File(fileName);
                     BufferedReader courseReader = new BufferedReader(new FileReader(usersCourseList));
-                    String data2;
-                    while ((data2 = courseReader.readLine()) != null) {
-                        String[] dataArray2 = data2.split(",");
+                    String courseLine;
+                    while ((courseLine = courseReader.readLine()) != null) {
+                        String[] dataArray2 = courseLine.split(",");
                         Course c = null;
                         try {
                             c = instructor.AddAndReturnCourse(dataArray2[0]);
                             if (!DoesCourseExists(c.getName())){
                                 courseList.add(c);
                             }
+
+                            BufferedReader examReader = new BufferedReader(new FileReader(c.getName() + "_ExamsList.txt"));
+                            String examLine;
+                            while ((examLine = examReader.readLine()) != null){
+                                System.out.println(examLine);
+                                String[] examInfo = examLine.split(",");
+                                Exam exam = new Exam();
+                                //examType,examDate,examPoint,courseName_SheetList.txt,courseName_QnA_List.txt
+                                exam.SetType(examInfo[1]);
+                                String [] dateInfo = examInfo[2].split("\\.");
+                                int [] dateInfoAsInt = new int[dateInfo.length];
+                                for (int i = 0; i <dateInfo.length ; i++) {
+                                    dateInfoAsInt[i] = Integer.parseInt(dateInfo[i]);
+                                }
+                                System.out.println(Arrays.toString(dateInfo));
+                                System.out.println(Arrays.toString(dateInfoAsInt));
+
+                                exam.SetDate(dateInfoAsInt);
+                                exam.SetPoint(Integer.parseInt(examInfo[3]));
+                                c.GetExamList().add(exam);
+                            }
+
                             //c.AddInstructor(instructor);
                             /*if (!DoesCourseExistInStoringFiles(c.getName())) {
                                 AddCourse(c, instructor);

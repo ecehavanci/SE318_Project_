@@ -28,15 +28,19 @@ public class Course {
         exam.SetID(examList.size());
         TextColours.writeBlue("adding exam");
         FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
-        examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetFullDate() + "," + exam.GetPoint() + "," + name + "_SheetList.txt" + "," + name + "_QnA_List.txt" + System.getProperty("line.separator"));
+        examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
         examList.add(exam);
         examWriter.close();
     }
+
 
     public Exam GetExam(int index) {
         return examList.get(index);
     }
 
+    public ArrayList<Exam> GetExamList() {
+        return examList;
+    }
 
     public int ExamCount() {
         return examList.size();

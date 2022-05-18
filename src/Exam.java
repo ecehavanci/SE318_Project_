@@ -4,7 +4,7 @@ import java.time.format.FormatStyle;
 import java.util.*;
 
 public class Exam {
-    private int ID; //This is for text-database purposes
+    private int ID; //This is for text-database purposes, it is used while exam editing
     private String type;//midterm, final, quiz etc.
     private LocalDate date;//the date of the exam
     private final ArrayList<StudentSheet> studentSheetList = new ArrayList<>();
@@ -21,6 +21,10 @@ public class Exam {
 
     public List<QuestionAndAnswer> GetQnA_List() {
         return QnA_List;
+    }
+
+    public void SetType(String type) {
+        this.type = type;
     }
 
     public ArrayList<StudentSheet> GetStudentSheetList() {
@@ -59,6 +63,10 @@ public class Exam {
     //Get date with its day, month, year
     public String GetLongDate() {
         return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+    }
+
+    public String GetStoringDate() {
+        return date.getDayOfMonth() + "." + date.getMonthValue() + "." + date.getYear();
     }
 
 
