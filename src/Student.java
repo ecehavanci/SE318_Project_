@@ -2,6 +2,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -66,12 +68,14 @@ public class Student extends User {
                 System.out.println("Don't have any exams");
             }
             LocalDateTime localDate = LocalDateTime.now();
-
+            System.out.println(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
             for (int j = 0; j < exams; j++) {
                 Exam exam = courseList.get(i).GetExam(j);
+                TextColours.writeBlue(String.valueOf(localDate.isBefore(exam.GetLocalDateTime())));
                 if (localDate.isBefore(exam.GetLocalDateTime())) {
+                    TextColours.writeBlue("WE ARE IN!");
                     Course course = courseList.get(i);
-                    course.ShowExamDetails();
+                    course.ShowExamDetailsWithIndex(j);
                 }
             }
         }

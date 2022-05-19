@@ -239,7 +239,7 @@ public class Database {
                     System.out.println("User not found");
                 }
                 if (student != null) {
-                    File usersCourseList = new File(dataArray[5]);
+                    File usersCourseList = new File(dataArray[1] + "_CourseList.txt");
                     BufferedReader courseReader = new BufferedReader(new FileReader(usersCourseList));
                     String data2;
                     while ((data2 = courseReader.readLine()) != null) {

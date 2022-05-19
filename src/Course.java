@@ -89,16 +89,22 @@ public class Course {
     //Exam details consists of the lesson exam belongs to, exam's name, type and date
     public void ShowExamDetails() {
         for (int i = 0; i < examList.size(); i++) {
-            Exam e = examList.get(i);
-            System.out.println("Lesson name: " + name);
-            System.out.println("EXAM " + (i + 1));
-            System.out.println("Exam type: " + e.GetType());
-            System.out.println("Date: " + e.GetLongDate());
-            System.out.println("Time: " + e.GetTime());
-
-            System.out.println();
+            ShowExamDetailsWithIndex(i);
         }
     }
+
+    public void ShowExamDetailsWithIndex(int i) {
+        Exam e = examList.get(i);
+        System.out.println("Lesson name: " + name);
+        System.out.println("EXAM " + (i + 1));
+        System.out.println("Exam type: " + e.GetType());
+        System.out.println("Date: " + e.GetLongDate());
+        System.out.println("Time: " + e.GetTime());
+
+        System.out.println();
+    }
+
+
 
     //This function is for printing Lesson with info of it (its name, its instrutor's name details -exam list-)
     public void Print() {
