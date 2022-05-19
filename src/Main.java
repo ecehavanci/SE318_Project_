@@ -217,7 +217,7 @@ public class Main {
 
     private static void seeExamInfo(Database database, Student student) {
         Scanner scan = new Scanner(System.in);
-        student.getExams();
+        student.getUpcomingExams();
     }
 
     public static void BuildUpExam(Instructor inst) throws CourseNotFoundException {

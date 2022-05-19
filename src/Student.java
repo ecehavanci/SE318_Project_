@@ -1,5 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -16,7 +18,7 @@ public class Student extends User {
         //----------DATABASE ADDITION----------
         Database db = Database.getInstance();
         System.out.println(TextColours.blue + getSchoolID() + TextColours.reset);
-        String fileName = getSchoolID()+"_CourseList.txt";
+        String fileName = getSchoolID() + "_CourseList.txt";
 
         try {
             FileWriter fw = new FileWriter(fileName, true);
@@ -54,4 +56,25 @@ public class Student extends User {
         }
     }
 
+    public void getUpcomingExams() {
+        System.out.println("Upcoming exams: ");
+
+        for (int i = 0; i < courseList.size(); i++) {
+            int exams = courseList.get(i).ExamCount();
+
+            if (exams == 0) {
+                System.out.println("Don't have any exams");
+            }
+            LocalDateTime localDate = LocalDateTime.now();
+
+            for (int j = 0; j < exams; j++) {
+                Exam exam = courseList.get(i).GetExam(j);
+                if (localDate.isBefore(exam.GetLocalDateTime())) {
+                    Course course = courseList.get(i);
+                    course.ShowExamDetails();
+                }
+            }
+        }
+
+    }
 }

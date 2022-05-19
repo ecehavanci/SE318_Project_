@@ -75,6 +75,10 @@ public class Exam {
         return dateAndTime.getHour() + ":" +dateAndTime.getMinute();
     }
 
+    public LocalDateTime GetLocalDateTime(){
+        return dateAndTime;
+    }
+
     public String GetStoringDate() {
         return dateAndTime.getDayOfMonth() + "." + dateAndTime.getMonthValue() + "." + dateAndTime.getYear() + "." + dateAndTime.getHour() + "." + dateAndTime.getMinute();
     }
