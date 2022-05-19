@@ -1,4 +1,6 @@
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
@@ -6,7 +8,7 @@ import java.util.*;
 public class Exam {
     private int ID; //This is for text-database purposes, it is used while exam editing
     private String type;//midterm, final, quiz etc.
-    private LocalDate date;//the date of the exam
+    private LocalDateTime dateAndTime;
     private final ArrayList<StudentSheet> studentSheetList = new ArrayList<>();
     private int point;
     private final List<QuestionAndAnswer> QnA_List = new ArrayList<>();
@@ -40,11 +42,12 @@ public class Exam {
     }
 
     //Dates are set using an array filled with inputs taken from instructor
-    public void SetDate(int[] dayMonthYear) {
-        date = LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
+    public void SetDateAndTime(int[] dayMonthYear, int hour, int minute) {
+        dateAndTime = LocalDateTime.of(LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]), LocalTime.of(hour,minute));
     }
-    public void SetTime(int hour, int minute) {
-        date.atTime(hour, minute);
+
+    public String GetDateAndTime() {
+        return dateAndTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG));
     }
 
     //Exam type can be edited (for example can be set as midterm but then changed to a quiz)
@@ -60,16 +63,20 @@ public class Exam {
 
     //Get date with its day, month, year, day of week
     public String GetFullDate() {
-        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL));
+        return dateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL));
     }
 
     //Get date with its day, month, year
     public String GetLongDate() {
-        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+        return dateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+    }
+
+    public String GetTime() {
+        return dateAndTime.getHour() + ":" +dateAndTime.getMinute();
     }
 
     public String GetStoringDate() {
-        return date.getDayOfMonth() + "." + date.getMonthValue() + "." + date.getYear();
+        return dateAndTime.getDayOfMonth() + "." + dateAndTime.getMonthValue() + "." + dateAndTime.getYear() + "." + dateAndTime.getHour() + "." + dateAndTime.getMinute();
     }
 
 
@@ -94,7 +101,7 @@ public class Exam {
     }
 
     //EXPERIMENTAL ADDITION
-    public void take(Student student) {
+    public void Take(Student student) {
         System.out.println("\n\n~" + type.toUpperCase(Locale.ROOT) + "~\n");
         Scanner scan = new Scanner(System.in);
         ArrayList<String> studentAnswers = new ArrayList<>();

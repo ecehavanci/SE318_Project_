@@ -94,6 +94,8 @@ public class Course {
             System.out.println("EXAM " + (i + 1));
             System.out.println("Exam type: " + e.GetType());
             System.out.println("Date: " + e.GetLongDate());
+            System.out.println("Time: " + e.GetTime());
+
             System.out.println();
         }
     }

@@ -205,10 +205,11 @@ public class Database {
                                 for (int i = 0; i <dateInfo.length ; i++) {
                                     dateInfoAsInt[i] = Integer.parseInt(dateInfo[i]);
                                 }
+                                int [] dateArray = new int[]{dateInfoAsInt[0],dateInfoAsInt[1],dateInfoAsInt[2]};
                                 System.out.println(Arrays.toString(dateInfo));
                                 System.out.println(Arrays.toString(dateInfoAsInt));
 
-                                exam.SetDate(dateInfoAsInt);
+                                exam.SetDateAndTime(dateArray,dateInfoAsInt[3],dateInfoAsInt[4]);
                                 exam.SetPoint(Integer.parseInt(examInfo[3]));
                                 c.GetExamList().add(exam);
                             }

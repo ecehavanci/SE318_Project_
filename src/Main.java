@@ -25,7 +25,7 @@ public class Main {
 
         while (true) {
 
-            for (User user: database.userList){
+            for (User user : database.userList) {
                 System.out.println(user.getName());
             }
             User user = ShowMainMenu(database);
@@ -98,7 +98,7 @@ public class Main {
                                         scan.nextLine();
                                         try {
                                             Exam exam = course.GetExam(examIndex - 1);
-                                            exam.take(student);
+                                            exam.Take(student);
                                         } catch (IndexOutOfBoundsException IOOBE) {
                                             System.out.println("There is no exam in the given index");
                                         }
@@ -178,7 +178,7 @@ public class Main {
                         }
                         case 4 -> {
                             //TODO: Grade or approve exams
-                            for (int i = 0; i < instructor.courseList.size() ; i++) {
+                            for (int i = 0; i < instructor.courseList.size(); i++) {
                                 instructor.courseList.get(i).ShowExamDetails();
                             }
 
@@ -186,18 +186,20 @@ public class Main {
                             String courseName = scan.nextLine();
 
                             System.out.println("Which exam do you want to grade: ");
-                            int examIndex = scan.nextInt();scan.nextLine();
+                            int examIndex = scan.nextInt();
+                            scan.nextLine();
 
-                            instructor.GradeUnevaluatedQuestions(courseName,examIndex);
+                            instructor.GradeUnevaluatedQuestions(courseName, examIndex);
                         }
                         case 5 -> {
                             System.out.println("Which course's would you like to see the average grade?");
                             String courseName = scan.nextLine();
 
                             System.out.println("Which exam do you want to see: ");
-                            int examIndex = scan.nextInt();scan.nextLine();
+                            int examIndex = scan.nextInt();
+                            scan.nextLine();
 
-                           instructor.ShowExamStatistics(courseName,examIndex);
+                            instructor.ShowExamStatistics(courseName, examIndex);
                         }
                         case 6 -> {
                             System.out.println("Logging out...");
@@ -300,8 +302,7 @@ public class Main {
 
                         if ((int) choiceCode > (64 + choiceCount)) {
                             System.out.println("There is no choice " + choiceCode + ". Please enter again.");
-                        }
-                        else{
+                        } else {
                             break;
                         }
                     }
@@ -332,7 +333,7 @@ public class Main {
 
                     TrueFalseAnswer tfa = new TrueFalseAnswer(answer);
 
-                    System.out.println("How much point is this question?");
+                    System.out.println("How many points is this question?");
                     int point = scan.nextInt();
                     scan.nextLine();
                     examPointTotal += point;
@@ -354,14 +355,6 @@ public class Main {
             //When instructor is done with adding the exam questions, he/she has to specify the date and type of the exam
             System.out.print("Please enter a date: ");
             SetDate(exam);
-
-            System.out.print("Please enter the hour: ");
-            int hour = scan.nextInt();
-
-            System.out.print("Please enter the minute: ");
-            int minute = scan.nextInt();
-
-            exam.SetTime(hour,minute);
 
             //The attribute could be final, quiz, midterm, etc.
             System.out.print("Please enter the type of the exam: ");
@@ -408,17 +401,16 @@ public class Main {
                         break;
                     }
 
-                    if (signingUpChoice == 1 || signingUpChoice == 2){
+                    if (signingUpChoice == 1 || signingUpChoice == 2) {
                         int ID;
-                        while(true){
+                        while (true) {
                             System.out.println("School ID: ");
                             scan.nextLine();
-                            try{
+                            try {
                                 ID = scan.nextInt();
                                 scan.nextLine();
                                 break;
-                            }
-                            catch (InputMismatchException IME){
+                            } catch (InputMismatchException IME) {
                                 System.out.println("ID should be a number, please try again.");
                             }
                         }
@@ -434,8 +426,7 @@ public class Main {
                             case 1 -> db.registerInstructor(name, surname, ID, password);
                             case 2 -> db.registerStudent(name, surname, ID, password);
                         }
-                    }
-                    else System.out.println("Invalid choice.");
+                    } else System.out.println("Invalid choice.");
 
 
                 }
@@ -480,11 +471,36 @@ public class Main {
             if (splitDate == null) {
                 System.out.println("Please enter a valid date");
             } else {
+                if (splitDate.length != 3) {
+                    System.out.println("Please enter a valid date");
+                    continue;
+                }
                 int[] dateParts = new int[3];
                 for (int i = 0; i < 3; i++) {
                     dateParts[i] = Integer.parseInt(splitDate[i]);
                 }
-                exam.SetDate(dateParts);
+                int hour;
+                int minute;
+                while (true) {
+                    System.out.print("Please enter the time of the exam (HH:MM): ");
+                    String time = scan.nextLine();
+                    String[] splitTime = time.split(":");
+
+                    if (splitTime.length == 2) {
+                        hour = Integer.parseInt(splitTime[0]);
+                        minute = Integer.parseInt(splitTime[1]);
+                    } else {
+                        System.out.println("Please enter a valid time");
+                        continue;
+                    }
+
+                    if (hour > 23 || hour < 0 || minute > 60 || minute < 0) {
+                        System.out.println("Please enter a valid time");
+                    } else break;
+                    TextColours.writeBlue("We are stuck");
+                }
+
+                exam.SetDateAndTime(dateParts,hour, minute);
                 break;
             }
         }
@@ -526,22 +542,16 @@ public class Main {
     }
 
 
-
-
-
-
-
-
     //THIS METHOD IS FOR HELPING US DEBUG THE PROCESS: It creates default users, courses, exams etc. to see how changes affect.
 
-    public static void IMPORT_DEFAULTS(){
+    public static void IMPORT_DEFAULTS() {
         Database db = Database.getInstance();
         //Four default users: Instructor John and students Gerard, Alice and Cheryll
-        db.registerInstructor("John", "Roseland", 1,"1");
-        db.registerInstructor("William", "Wood", 2,"2");
-        db.registerStudent("Gerard", "Greene", 3,"3");
-        db.registerStudent("Alice", "King", 4,"4");
-        db.registerStudent("Cheryll", "Basket", 5,"5");
+        db.registerInstructor("John", "Roseland", 1, "1");
+        db.registerInstructor("William", "Wood", 2, "2");
+        db.registerStudent("Gerard", "Greene", 3, "3");
+        db.registerStudent("Alice", "King", 4, "4");
+        db.registerStudent("Cheryll", "Basket", 5, "5");
 
         Instructor instructorJ = (Instructor) db.userList.get(0);
         Instructor instructorW = (Instructor) db.userList.get(1);
@@ -573,19 +583,19 @@ public class Main {
         String classicalQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
         Answer classicalAnswer1 = new ClassicalAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
         classicalAnswer1.setRightAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
-        exam.AddQuestion(classicalQuestion1,classicalAnswer1,30,false);
+        exam.AddQuestion(classicalQuestion1, classicalAnswer1, 30, false);
 
         String trueFalseQuestion1 = "Mushrooms are classified as plants.";
         Answer trueFalseAnswer1 = new TrueFalseAnswer('F');
-        exam.AddQuestion(trueFalseQuestion1,trueFalseAnswer1,5,true);
+        exam.AddQuestion(trueFalseQuestion1, trueFalseAnswer1, 5, true);
 
         String trueFalseQuestion2 = "Mammals are known for laying eggs.";
         Answer trueFalseAnswer2 = new TrueFalseAnswer('F');
-        exam.AddQuestion(trueFalseQuestion2,trueFalseAnswer2,5,true);
+        exam.AddQuestion(trueFalseQuestion2, trueFalseAnswer2, 5, true);
 
         String trueFalseQuestion3 = "Humans and dinosaurs never lived in the same era.";
         Answer trueFalseAnswer3 = new TrueFalseAnswer('T');
-        exam.AddQuestion(trueFalseQuestion3,trueFalseAnswer3,5,true);
+        exam.AddQuestion(trueFalseQuestion3, trueFalseAnswer3, 5, true);
 
         String multipleChoiceQuestion1 = "Which human species did homo sapiens lived together with?";
         MultipleChoiceAnswer multipleChoiceAnswer1 = new MultipleChoiceAnswer();
@@ -595,15 +605,15 @@ public class Main {
         multipleChoiceAnswer1.addChoice(new Choice("Homo rhodesiensis", false));
         multipleChoiceAnswer1.setRightAnswer("C");
 
-        exam.AddQuestion(multipleChoiceQuestion1,multipleChoiceAnswer1,10,true);
+        exam.AddQuestion(multipleChoiceQuestion1, multipleChoiceAnswer1, 10, true);
 
         String classicalQuestion2 = "Summarize Lamarckian Eveolution in 2-3 sentences and give an example.";
         Answer classicalAnswer2 = new ClassicalAnswer("");
-        exam.AddQuestion(classicalQuestion2,classicalAnswer2,45,false);
+        exam.AddQuestion(classicalQuestion2, classicalAnswer2, 45, false);
 
         exam.SetPoint(100);
         exam.EditType("Midterm");
-        exam.SetDate(new int[]{6, 6, 2022});
+        exam.SetDateAndTime(new int[]{6, 6, 2022},10,50);
 
         try {
             db.FindCourse("BIO 101").AddExam(exam);
