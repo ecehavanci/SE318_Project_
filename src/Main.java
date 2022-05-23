@@ -24,9 +24,9 @@ public class Main {
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
         //ADDITIONALLY THIS METHOD IS USING AN UNOFFICIAL SIGNING UP METHOD WHICH MEANS IT SHOULD ONLY BE RUN ONCE THEN COMMENTED
         //IMPORT_DEFAULTS();
-        Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
+        /*Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
         database.courseList.get(0).GetExamList().add(defaultExams[0]);
-        database.courseList.get(1).GetExamList().add(defaultExams[1]);
+        database.courseList.get(1).GetExamList().add(defaultExams[1]);*/
 
 
         while (true) {
