@@ -26,10 +26,21 @@ public class Course {
 
     public void AddExam(Exam exam) throws IOException {
         exam.SetID(examList.size());
-        TextColours.writeBlue("adding exam");
+
+        //Exam is added to its text file: LessonName_ExamList.txt.
+        //It is added to a new line in the following manner: ID,type,day.month.year.hour.minute,point
         FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
-        examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
-        examList.add(exam);
+        boolean willAddLesson = true;
+        for (Exam ex : examList){
+            if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())){
+                willAddLesson=false;
+            }
+        }
+
+        if (willAddLesson){
+            examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
+            examList.add(exam);
+        }
         examWriter.close();
     }
 
@@ -56,21 +67,6 @@ public class Course {
 
     public void AddInstructor(Instructor instructor) {
         instructors.add(instructor);
-        /*Database db = Database.getInstance();
-        try {
-            int userIndex = db.ReturnUserIndex(instructor);
-            if (userIndex == -1){
-                System.out.println("Instructor not registered");
-            }
-            else{
-                FileWriter fr = new FileWriter(name + "_InstructorList.txt", true);
-                fr.write(String.valueOf(instructor.getSchoolID()));
-                fr.close();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void PrintInstructors() {

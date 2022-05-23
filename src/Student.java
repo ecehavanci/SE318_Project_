@@ -17,19 +17,17 @@ public class Student extends User {
         //When a student is enrolled a course, this course is added to the courseList of that student who enrolled the course
         courseList.add(course);
 
-        //----------DATABASE ADDITION----------
         Database db = Database.getInstance();
         System.out.println(TextColours.blue + getSchoolID() + TextColours.reset);
         String fileName = getSchoolID() + "_CourseList.txt";
 
         try {
             FileWriter fw = new FileWriter(fileName, true);
-            fw.write(course.getName());
+            fw.write(course.getName() + System.getProperty("line.separator"));
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //----------DATABASE ADDITION----------
 
         System.out.println("Successfully enrolled");
 
@@ -68,17 +66,24 @@ public class Student extends User {
                 System.out.println("Don't have any exams");
             }
             LocalDateTime localDate = LocalDateTime.now();
-            System.out.println(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
             for (int j = 0; j < exams; j++) {
                 Exam exam = courseList.get(i).GetExam(j);
-                TextColours.writeBlue(String.valueOf(localDate.isBefore(exam.GetLocalDateTime())));
                 if (localDate.isBefore(exam.GetLocalDateTime())) {
-                    TextColours.writeBlue("WE ARE IN!");
                     Course course = courseList.get(i);
                     course.ShowExamDetailsWithIndex(j);
                 }
             }
         }
+    }
 
+    //EXPERIMENTAL ADDITION
+    public boolean isTakingCourse(String courseName){
+        try{
+            FindCourse(courseName);
+            return true;
+        }
+        catch (CourseNotFoundException CNFE){
+            return false;
+        }
     }
 }

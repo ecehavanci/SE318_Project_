@@ -28,18 +28,21 @@ public class Database {
         try {
             CheckUserExists(schoolID);
 
+            //Every user is stored in UserList.txt, if it is already stored system does not try to store again
             if (!DoesUserExistInStoringFiles(schoolID)) {
                 FileWriter fw = new FileWriter(userListText, true);
 
+                //Every user has their course list, the course list text file is created here
                 File CourseListText = new File(schoolID + "_CourseList.txt");
-                System.out.println(CourseListText.createNewFile());
+                CourseListText.createNewFile();
 
+                //Instructors are stored in the following manner: instructor,ID,password,name,surname
                 fw.write("instructor," + schoolID + "," + password + "," + name + "," + surname + System.getProperty("line.separator"));
                 fw.close();
             }
             User newUser = new Instructor(name, surname, schoolID, password);
             userList.add(newUser);
-            System.out.println("Registration successful.");
+            TextColours.writeBlue("Registration successful.");
 
 
         } catch (UserAlreadyExistsException UAEE) {
@@ -53,23 +56,25 @@ public class Database {
         try {
             CheckUserExists(schoolID);
 
+            //Every user is stored in UserList.txt, if it is already stored system does not try to store again
             if (!DoesUserExistInStoringFiles(schoolID)) {
                 FileWriter fw = new FileWriter(userListText, true);
 
+                //Every user has their course list, the course list text file is created here
                 File CourseListText = new File(schoolID + "_CourseList.txt");
                 CourseListText.createNewFile();
 
-
+                //Students are stored in the following manner: student,ID,password,name,surname
                 fw.write("student," + schoolID + "," + password + "," + name + "," + surname + System.getProperty("line.separator"));
                 fw.close();
             }
             User newUser = new Student(name, surname, schoolID, password);
             userList.add(newUser);
-            System.out.println("Registration successful.");
+            TextColours.writeBlue("Registration successful.");
 
 
         } catch (UserAlreadyExistsException UAEE) {
-            System.out.println("This school id already exists, please try again.");
+            TextColours.writeYellow("This school id already exists, please try again.");
         } catch (IOException e) {
             System.out.println("We cannot register you right now, please try again later.");
         }
@@ -97,16 +102,15 @@ public class Database {
         System.out.println("Adding course...");
         if (!DoesCourseExists(course.getName())) {
             if (!DoesCourseExistInStoringFiles(course.getName())) {
-                //Adding to text files, so it stays permanently
+                //Adding to text file CourseList.txt (we store all courses here) so it stays permanently
                 FileWriter fw = new FileWriter("CourseList.txt", true);
 
+                //Every course have their examList that is created using their names: courseName_ExamList.txt (because no
+                //two exams can have the same name)
                 File examListText = new File(course.getName() + "_ExamsList.txt");
                 examListText.createNewFile();
 
-                //File instructorListText = new File(course.getName() + "_InstructorList.txt");
-                //instructorListText.createNewFile();
-
-                fw.write(course.getName() /*+ "," + instructorListText.getName() + "," + examListText.getName()*/ + System.getProperty("line.separator"));
+                fw.write(course.getName() + System.getProperty("line.separator"));
 
                 fw.close();
             }
@@ -158,10 +162,8 @@ public class Database {
         String data;
         while ((data = userReader.readLine()) != null) {
             String[] dataArray = data.split(",");
-            System.out.println(Arrays.toString(dataArray));
-            if (dataArray[0].equals("instructor")) {
-                System.out.println(TextColours.blue + "Importing an instructor..." + TextColours.reset);
 
+            if (dataArray[0].equals("instructor")) {
                 int ID = Integer.parseInt(dataArray[1]);
 
                 //Here an instructor is created with given data in UserList.txt line by line
@@ -179,9 +181,10 @@ public class Database {
                 if (instructor != null) {
                     //dataArray[1] + "_CourseList" is the data which points to a text file that all names of courses instructor is giving is stored
                     String fileName = ID + "_CourseList.txt";
-                    System.out.println("ID: " + ID);
                     File usersCourseList = new File(fileName);
                     BufferedReader courseReader = new BufferedReader(new FileReader(usersCourseList));
+
+                    //All course names are read from a particular user's courseList and added to their courses in the system
                     String courseLine;
                     while ((courseLine = courseReader.readLine()) != null) {
                         String[] dataArray2 = courseLine.split(",");
@@ -192,13 +195,14 @@ public class Database {
                                 courseList.add(c);
                             }
 
+                            //All exam names are read from a particular course's examList and added to their exams in the system
+
                             BufferedReader examReader = new BufferedReader(new FileReader(c.getName() + "_ExamsList.txt"));
                             String examLine;
                             while ((examLine = examReader.readLine()) != null){
-                                System.out.println(examLine);
                                 String[] examInfo = examLine.split(",");
                                 Exam exam = new Exam();
-                                //examType,examDate,examPoint,courseName_SheetList.txt,courseName_QnA_List.txt
+
                                 exam.SetType(examInfo[1]);
                                 String [] dateInfo = examInfo[2].split("\\.");
                                 int [] dateInfoAsInt = new int[dateInfo.length];
@@ -206,18 +210,22 @@ public class Database {
                                     dateInfoAsInt[i] = Integer.parseInt(dateInfo[i]);
                                 }
                                 int [] dateArray = new int[]{dateInfoAsInt[0],dateInfoAsInt[1],dateInfoAsInt[2]};
-                                System.out.println(Arrays.toString(dateInfo));
-                                System.out.println(Arrays.toString(dateInfoAsInt));
 
                                 exam.SetDateAndTime(dateArray,dateInfoAsInt[3],dateInfoAsInt[4]);
                                 exam.SetPoint(Integer.parseInt(examInfo[3]));
-                                c.GetExamList().add(exam);
+                                boolean willAddLesson = true;
+                                for (Exam ex : c.GetExamList()){
+                                    if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())){
+                                        willAddLesson=false;
+                                    }
+                                }
+                                if (willAddLesson){
+                                    c.GetExamList().add(exam);
+                                }
+
+
                             }
 
-                            //c.AddInstructor(instructor);
-                            /*if (!DoesCourseExistInStoringFiles(c.getName())) {
-                                AddCourse(c, instructor);
-                            }*/
                         } catch (CourseAlreadyExistsException e) {
                             //No problem even such an error is occurred, in this method we expect no output, no warning, etc.
                         }
@@ -227,9 +235,9 @@ public class Database {
                 }
 
             } else if (dataArray[0].equals("student")) {
-                System.out.println(data);
-
                 int ID = Integer.parseInt(dataArray[2]);
+
+                //Here a student is created with given data in UserList.txt line by line
                 userList.add(new Student(dataArray[3], dataArray[4], ID, dataArray[2]));
 
                 Student student = null;
@@ -239,6 +247,7 @@ public class Database {
                     System.out.println("User not found");
                 }
                 if (student != null) {
+                    //dataArray[1] + "_CourseList" is the data which points to a text file that all names of courses student is taking is stored
                     File usersCourseList = new File(dataArray[1] + "_CourseList.txt");
                     BufferedReader courseReader = new BufferedReader(new FileReader(usersCourseList));
                     String data2;
@@ -253,21 +262,10 @@ public class Database {
                 }
 
             } else {
-                System.out.println("Problem with database importing!!!!!");
+                TextColours.writeRed("Problem with database importing!!!!!");
                 break;
             }
-            System.out.println(TextColours.blue + "Now we are supposed to go next line and at the end we have an output..." + TextColours.reset);
         }
-        System.out.println("\n\n\n");
-
-        System.out.println(TextColours.blue + "SURPRISE!" + TextColours.reset);
-
-        FileReader fr = new FileReader(userListText);
-        BufferedReader br = new BufferedReader(fr);
-        List<String> myfilevar = Files.readAllLines(Paths.get("UserList.txt"));
-        System.out.println(myfilevar);
-        String st;
-
     }
 
 
@@ -293,6 +291,7 @@ public class Database {
     }
 
     public boolean DoesCourseExistInStoringFiles(String courseName, String textName) throws IOException {
+        //This function seeks course in CourseList.txt and evaluates true or false according to if file is found or not
         BufferedReader br = new BufferedReader(new FileReader(textName));
         String st;
         while ((st = br.readLine()) != null) {
@@ -305,6 +304,7 @@ public class Database {
     }
 
     public boolean DoesUserExistInStoringFiles(int ID) throws IOException {
+        //This function seeks user in UserList.txt and evaluates true or false according to if file is found or not
         BufferedReader br = new BufferedReader(new FileReader("UserList.txt"));
         String st;
         while ((st = br.readLine()) != null) {
@@ -325,7 +325,7 @@ public class Database {
         return -1;
     }
 
-    public int ReturnOrCreateCourseIndex(Course course) {
+   /* public int ReturnOrCreateCourseIndex(Course course) {
         int index = -1;
         for (int i = 0; i < courseList.size(); i++) {
             if (courseList.get(i).getName().equals(course.getName())) {
@@ -337,7 +337,7 @@ public class Database {
         //If course index is not found, this means it is going to be created almost immediately this function is called.
         //So here index + 1 is referred to its position when it will be created.
         return (index + 1);
-    }
+    }*/
 
     public int ReturnCourseIndex(Course course) {
         for (int i = 0; i < courseList.size(); i++) {
@@ -395,6 +395,16 @@ class TextColours {
     public static void writeRed(String text){
         System.out.println(red + text + reset);
     }
+    public static void writePurple(String text){
+        System.out.println(purple + text + reset);
+    }
+    public static void writeGreen(String text){
+        System.out.println(green + text + reset);
+    }
+    public static void writeYellow(String text){
+        System.out.println(yellow + text + reset);
+    }
+
 
 
 }

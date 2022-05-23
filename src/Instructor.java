@@ -20,7 +20,6 @@ public class Instructor extends User {
 
     //This function adds and returns the course to instructor's local courseList so it can be added to the courseList in the database
     public Course AddAndReturnCourse(String courseName) throws CourseAlreadyExistsException, IOException {
-        System.out.println(TextColours.blue + "Adding and returning course" + TextColours.reset);
         Database db = Database.getInstance();
         if (!DoesCourseExists(courseName)) {
             Course course = null;
@@ -30,28 +29,22 @@ public class Instructor extends User {
                     course.AddInstructor(this);
 
                 } catch (CourseNotFoundException e) {
-                    System.out.println(TextColours.yellow + "Course not found" + TextColours.reset);
+                    TextColours.writeYellow("Course not found.");
                 }
             } else {
                 course = new Course(courseName, this);
             }
             if (course != null) {
+                //If an exam does not already exist in an in its relative storing file (instructorID_Courselist.txt), then
+                //it will be added to there.
                 if (!db.DoesCourseExistInStoringFiles(courseName, getSchoolID() + "_CourseList.txt")) {
                     String fileName = getSchoolID() + "_CourseList.txt";
                     FileWriter fw = new FileWriter(fileName, true);
                     fw.write(course.getName() + System.getProperty("line.separator"));
                     fw.close();
-
-                    /*String fileName2 = courseName + "_InstructorList.txt";
-                    FileWriter fw2 = new FileWriter(fileName2, true);
-                    System.out.println(getSchoolID());
-                    fw2.write(getSchoolID() + System.getProperty("line.separator"));
-                    fw2.close();*/
                 }
-
                 courseList.add(course);
             }
-
             return course;
         } else {
             throw new CourseAlreadyExistsException();
@@ -90,167 +83,124 @@ public class Instructor extends User {
     //This function is for changing details (name, exams, exam dates, exam type, etc.) of the given course
     private void SetCourseDetails(Course course) throws IOException {
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please choose what would you like to do: ");
-        System.out.println("1) Edit the name of the course");
-        System.out.println("2) Edit an exam");
-        System.out.println("Press any other key to cancel");
-        int detailChoice = scan.nextInt();
+
+        int detailChoice;
+        while (true) {
+            System.out.println("Please choose what would you like to do: ");
+            System.out.println("1) Edit the name of the course");
+            System.out.println("2) Edit an exam");
+            System.out.println("Press any other key to cancel");
+            try {
+                detailChoice = scan.nextInt();
+                break;
+            } catch (InputMismatchException IME) {
+                TextColours.writeYellow("You should enter an integer, please try again");
+            }
+            scan.nextLine();
+        }
         scan.nextLine();
+
         switch (detailChoice) {
             case 1 -> {
-                //TextColours.writeRed("1");
                 System.out.println("What is the new name of the course");
 
                 String courseName = scan.nextLine();
-                String oldCourseName=course.getName();
+                String oldCourseName = course.getName();
 
-
-                //CHANGING THE COURSE NAME FOR THE LIST THAT STORES ALL COURSES IN DATABASE: CourseList.txt
+                //Changing the name of the course in its relative text file (instructorsID_CourseList.txt) requires 4 steps:
+                //STEP 1: Changing its name in the CourseList.txt (the text file which stores all courses)
                 BufferedReader reader = new BufferedReader(new FileReader("CourseList.txt"));
                 ArrayList<String> allLines = new ArrayList<>();
                 String line = "";
-                while((line=reader.readLine())!=null){
+                //First all lines (all course names) is stored in an ArrayList
+                while ((line = reader.readLine()) != null) {
                     allLines.add(line);
                 }
                 reader.close();
 
-                System.out.println("HERE ARE LINES: " + allLines);
+                //System.out.println("HERE ARE LINES: " + allLines);
 
-                for (int i = 0 ; i< allLines.size(); i++){
-                    if (allLines.get(i).equals(course.getName())){
-                        TextColours.writeBlue("FOUND: " + course.getName() + "!");
-                        TextColours.writeBlue("Replacing " + course.getName() + " with " + courseName + " in temporary storing area...");
+                //Then, in the arraylist the name course (that is wanted to be changed) is changed
+                for (int i = 0; i < allLines.size(); i++) {
+                    if (allLines.get(i).equals(course.getName())) {
                         allLines.set(i, courseName);
                     }
                 }
 
+                //Since we have now a list with right course names, all the course names are read from here and written
+                //into CourseList.txt
                 FileWriter courseWriter = new FileWriter("CourseList.txt");
-                for (String replacingLine : allLines){
+                for (String replacingLine : allLines) {
                     courseWriter.write(replacingLine + System.getProperty("line.separator"));
                 }
                 courseWriter.close();
 
+                //STEP 4: Change the name of the course in student files (studentID_CourseList)
+                Database db = Database.getInstance();
+                for (User user : db.userList) {
+                    if (user instanceof Student) {
+                        Student student = (Student) user;
+                        if (student.isTakingCourse(oldCourseName)) {
+                            TextColours.writeRed("Taking course");
+                            File studentCourseFile = new File(student.getSchoolID() + "_CourseList.txt");
+
+                            //All courses are read from the student's course file
+                            BufferedReader examReader = new BufferedReader(new FileReader(studentCourseFile));
+                            ArrayList<String> exams = new ArrayList<>();
+                            String studentCourse = "";
+                            while ((studentCourse = examReader.readLine()) != null) {
+                                exams.add(studentCourse);
+                            }
+                            examReader.close();
+                            FileWriter studentCourseWriter = new FileWriter(studentCourseFile, true);
+
+                            for (String e : exams) {
+                                studentCourseWriter.write(e);
+                            }
+                            studentCourseWriter.close();
+
+                        }
+                    }
+                }
+
+                //Name is set here for further steps
                 course.setName(courseName);
-                //CHANGING THE COURSE NAME IN INSTRUCTORS DATABASE RECORDS: schoolID_CourseList.txt
-                FileWriter localCourseWriter = new FileWriter(getSchoolID()+"_CourseList.txt");
-                for (Course replacingLine : courseList){
+
+                //STEP 2: Course name is changed in instructor's course list text (instructorID_CourseList.txt)
+                FileWriter localCourseWriter = new FileWriter(getSchoolID() + "_CourseList.txt");
+                for (Course replacingLine : courseList) {
                     localCourseWriter.write(replacingLine.getName() + System.getProperty("line.separator"));
                 }
                 localCourseWriter.close();
 
+                //STEP 3: Course's exam List text file is changed
+                //Every course has en exam list text file relative to their names (name_ExamList.txt)
+                //A new text file is created for storing exams
                 File newCourseFile = new File(courseName + "_ExamsList.txt");
 
-                if (newCourseFile.createNewFile()){
-                    TextColours.writeBlue("New course file successfully created: " + newCourseFile);
+                if (newCourseFile.createNewFile()) {
                     FileWriter newCourseWriter = new FileWriter(newCourseFile, true);
-                    //newCourseWriter.write(courseName);
-                    //newCourseWriter.close();
 
                     File oldCourseFile = new File(oldCourseName + "_ExamsList.txt");
 
+                    //All exams are read from old file and written into the new one
                     BufferedReader examReader = new BufferedReader(new FileReader(oldCourseFile));
                     ArrayList<String> exams = new ArrayList<>();
                     String exam = "";
-                    while((exam=examReader.readLine())!=null){
+                    while ((exam = examReader.readLine()) != null) {
                         exams.add(exam);
                     }
                     System.out.println("HERE ARE EXAMS: " + exams);
                     examReader.close();
 
-                    for (String e : exams){
+                    for (String e : exams) {
                         newCourseWriter.write(e);
                     }
                     newCourseWriter.close();
-                }
-                else{
-                    TextColours.writeBlue("Course file creating failed for file: " + newCourseFile.getName());
-                }
-
-
-
-
-
-                //Files.delete(Paths.get(oldCourseFile.getPath()));
-
-                /*if (oldCourseFile.delete()){
-                    TextColours.writeBlue("Old course file successfully deleted.");
-                }
-                else{
-                    TextColours.writeBlue("Course file deleting failed for file: " + oldCourseFile.getName());
-                }*/
-
-
-
-
-
-                //deleting old courseName_ExamList and creating new one
-
-
-                /*File dFile = new File(courseName + "_ExamsList.txt");
-
-                TextColours.writeRed("2");
-
-                if (dFile.createNewFile()) {
-                    System.out.println("File created with name: " + dFile);
                 } else {
-                    System.out.println("Failed creating file: " + dFile);
+                    TextColours.writeRed("Course file creating failed for file: " + newCourseFile.getName());
                 }
 
-                File sFile = new File(course.getName() + "_ExamsList.txt");
-                FileReader fin = new FileReader(sFile);
-                FileWriter fout = new FileWriter(dFile, true);
-                int c;
-                while ((c = fin.read()) != -1) {
-                    fout.write(c);
-                }
-                TextColours.writeRed("3");
-
-                if (sFile.delete()) {
-                    System.out.println("File deleted with name: " + sFile);
-                } else {
-                    System.out.println("Failed deleting file: " + sFile);
-                }
-
-                TextColours.writeRed("4");
-
-                fin.close();
-                fout.close();
-
-                //Reading and storing kine by line
-                File mainCourseFile = new File("CourseList.txt");
-                FileReader mainCourseFileReader = new FileReader(mainCourseFile);
-                TextColours.writeRed("5");
-
-                BufferedReader courseReader = new BufferedReader(mainCourseFileReader);
-                ArrayList<String[]> allData = new ArrayList<>();
-                String data;
-                while ((data = courseReader.readLine()) != null) {
-                    String[] dataArray = data.split(",");
-                    //System.out.println(Arrays.toString(dataArray));
-                    allData.add(dataArray);
-                }
-
-                for (int i = 0; i < allData.size(); i++) {
-                    System.out.println(Arrays.toString(allData.get(i)));
-                }
-                TextColours.writeRed("6");
-
-
-                File tempFile = new File("TEMP.txt");
-                tempFile.createNewFile();
-                FileWriter courseWriter = new FileWriter(tempFile, true);
-
-                for (String[] line : allData) {
-                    courseWriter.write(line[0] + "," + line[1]);
-                }
-                TextColours.writeRed("7");
-
-                mainCourseFile.delete();
-                tempFile.renameTo(new File("CourseList.txt"));
-
-                courseReader.close();
-                mainCourseFileReader.close();
-                TextColours.writeRed("8");*/
 
             }
             case 2 -> {
@@ -261,16 +211,40 @@ public class Instructor extends User {
                     //Instructor chooses which exam they want to edit from the exam list by identifying the index (Users will think
                     //first index is one, second index is 2 and so on. But actually first index is 0 and second index is 1, and it
                     //continues like that. So code manages it by subtracting 1 from desired index)
-                    System.out.println("Which exam would you like to edit?");
-                    int editedExamIndex = scan.nextInt();
+
+                    int editedExamIndex;
+                    while (true) {
+                        System.out.println("Which exam would you like to edit?");
+                        try {
+                            editedExamIndex = scan.nextInt();
+                            if (editedExamIndex > course.ExamCount()) {
+                                TextColours.writeYellow("There is no exam at the given index, please try again.");
+                                continue;
+                            }
+                            break;
+                        } catch (InputMismatchException IME) {
+                            TextColours.writeYellow("Exam index should be an integer, please try again");
+                        }
+                        scan.nextLine();
+                    }
+                    scan.nextLine();
 
                     if (editedExamIndex >= 1 || editedExamIndex <= course.ExamCount()) {
-                        System.out.println("What would you like to edit?");
-                        System.out.println("1) Exam type");
-                        System.out.println("2) Exam date");
-                        System.out.println("Press any other key to cancel");
+                        int editChoice;
+                        while (true) {
+                            System.out.println("What would you like to edit?");
+                            System.out.println("1) Exam type");
+                            System.out.println("2) Exam date");
+                            System.out.println("Press any other key to cancel");
 
-                        int editChoice = scan.nextInt();
+                            try {
+                                editChoice = scan.nextInt();
+                                break;
+                            } catch (InputMismatchException IME) {
+                                TextColours.writeYellow("You should enter an integer, please try again");
+                            }
+                            scan.nextLine();
+                        }
                         scan.nextLine();
 
                         switch (editChoice) {
@@ -314,7 +288,7 @@ public class Instructor extends User {
                 System.out.println("There is no exam by the given index.");
             }
         } catch (CourseNotFoundException e) {
-            System.out.println(TextColours.yellow + "Course not found" + TextColours.reset);
+            TextColours.writeYellow("Course not found.");
 
         }
 
@@ -342,8 +316,18 @@ public class Instructor extends User {
                             System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
                             System.out.println();
 
-                            System.out.println("Grade the answer out of " + QnA_List.get(j).getPoint());
-                            int point = scan.nextInt();
+                            int point;
+                            while (true) {
+                                System.out.println("Grade the answer out of " + QnA_List.get(j).getPoint());
+
+                                try {
+                                    point = scan.nextInt();
+                                    break;
+                                } catch (InputMismatchException IME) {
+                                    TextColours.writeYellow("Grade should be an integer, please try again");
+                                }
+                                scan.nextLine();
+                            }
                             scan.nextLine();
 
                             sheets.get(i).addToGrade(point);
@@ -361,11 +345,25 @@ public class Instructor extends User {
 
                     System.out.println(studentName + "'s sheet got " + sheets.get(i).getGrade());
 
-                    System.out.println("Do you approve?");
-                    System.out.println("1) Approve");
-                    System.out.println("2) Not approve");
 
-                    int approval = scan.nextInt();
+                    int approval;
+                    while (true) {
+                        System.out.println("Do you approve?");
+                        System.out.println("1) Approve");
+                        System.out.println("2) Not approve");
+
+                        try {
+                            approval = scan.nextInt();
+                            if (!(approval == 1 || approval == 2)) {
+                                throw new WrongChoiceException();
+                            }
+                            break;
+                        } catch (InputMismatchException | WrongChoiceException IME) {
+                            TextColours.writeYellow("Please enter 1 or 2");
+                        }
+                        scan.nextLine();
+                    }
+                    scan.nextLine();
                     scan.nextLine();
 
                     if (approval == 1) {
@@ -375,8 +373,8 @@ public class Instructor extends User {
                     }
 
                 }
-                System.out.println("All exam sheets are revised.");
-            } else System.out.println("All sheets are approved.");
+                TextColours.writeBlue("All exam sheets are revised.");
+            } else TextColours.writeBlue("All sheets are approved.");
         }
     }
 
@@ -393,10 +391,10 @@ public class Instructor extends User {
                 sheets = exam.GetStudentSheetList();
 
             } else {
-                System.out.println("There is no exam by the given index.");
+                TextColours.writeYellow("There is no exam by the given index.");
             }
         } catch (CourseNotFoundException e) {
-            System.out.println(TextColours.yellow + "Lesson not found" + TextColours.reset);
+            TextColours.writeYellow("Course not found.");
         }
         System.out.println("\n\nRESULTS OF " + courseName);
 

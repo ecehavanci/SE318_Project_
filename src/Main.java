@@ -10,6 +10,8 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         Database database = Database.getInstance();
 
+        //Everything that is meant to be stored is written into text files. Here, at the begginning of the system, IMPORT fuction
+        //of database is called to load all the data that is stored to feature.
         try {
             database.IMPORT();
         } catch (IOException e) {
@@ -20,17 +22,17 @@ public class Main {
 
         System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
+        //ADDITIONALLY THIS METHOD IS USING AN UNOFFICIAL SIGNING UP METHOD WHICH MEANS IT SHOULD ONLY BE RUN ONCE THEN COMMENTED
         //IMPORT_DEFAULTS();
+        Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
+        database.courseList.get(0).GetExamList().add(defaultExams[0]);
+        database.courseList.get(1).GetExamList().add(defaultExams[1]);
 
 
         while (true) {
-
-            for (User user : database.userList) {
-                System.out.println(user.getName());
-            }
             User user = ShowMainMenu(database);
 
-            System.out.println("Welcome, " + user.getName() + ".");
+            TextColours.writePurple("Welcome, " + user.getName() + ".");
 
             if (Objects.equals(user.getToken(), "student")) {
 
@@ -76,11 +78,10 @@ public class Main {
                             willLogOut = true;
                         }
 
-                        //EXPERIMENTAL ADDITION
                         case 5 -> {
                             //System.out.println("Your upcoming exams:");
                             if (student.ExamCountTotal() > 0) {
-                                student.getExams();
+                                student.getUpcomingExams();
 
                                 System.out.println("Which course's exam do you want to take?");
                                 String courseName = scan.nextLine();
@@ -89,7 +90,7 @@ public class Main {
                                     try {
                                         course = database.FindCourse(courseName);
                                     } catch (CourseNotFoundException LNFE) {
-                                        System.out.println("Course not found");
+                                        TextColours.writeYellow("Course not found");
                                     }
 
                                     if (course != null) {
@@ -163,7 +164,7 @@ public class Main {
                                 //This action shows all the courses, instructor gives and then enables instructor to change their details
                                 instructor.ShowCourseDetails(courseName);
                             } catch (CourseNotFoundException LNFE) {
-                                System.out.println("Course not found");
+                                TextColours.writeYellow("Course not found");
                             }
 
                         }
@@ -172,7 +173,7 @@ public class Main {
                                 //This action enables instructor to build an exam with desired questions in it
                                 BuildUpExam(instructor);
                             } catch (CourseNotFoundException LNFE) {
-                                System.out.println("Course not found");
+                                TextColours.writeYellow("Course not found");
                             }
 
                         }
@@ -195,9 +196,21 @@ public class Main {
                             System.out.println("Which course's would you like to see the average grade?");
                             String courseName = scan.nextLine();
 
-                            System.out.println("Which exam do you want to see: ");
-                            int examIndex = scan.nextInt();
+
+                            int examIndex;
+                            while (true) {
+                                System.out.println("Which exam do you want to see: ");
+
+                                try {
+                                    examIndex = scan.nextInt();
+                                    break;
+                                } catch (InputMismatchException IME) {
+                                    TextColours.writeYellow("Exam index should be an integer, please try again.");
+                                }
+                                scan.nextLine();
+                            }
                             scan.nextLine();
+
 
                             instructor.ShowExamStatistics(courseName, examIndex);
                         }
@@ -243,8 +256,15 @@ public class Main {
             System.out.println("4) Finish exam building");
             System.out.println("5) Cancel exam building");
 
-            int examChoice = scan.nextInt();
-            scan.nextLine();
+            int examChoice;
+            try{
+                examChoice = scan.nextInt();
+                scan.nextLine();
+            }
+            catch (InputMismatchException IME){
+                TextColours.writeYellow("You should enter an integer, please try again.");
+                continue;
+            }
 
             switch (examChoice) {
                 case 1 -> {
@@ -263,8 +283,18 @@ public class Main {
                         answerText = scan.nextLine();
                     }
 
-                    System.out.println("How many points is this question?");
-                    int point = scan.nextInt();
+                    int point;
+                    while (true) {
+                        System.out.println("How many points is this question?");
+
+                        try {
+                            point = scan.nextInt();
+                            break;
+                        } catch (InputMismatchException IME) {
+                            TextColours.writeYellow("Grade should be an integer, please try again");
+                        }
+                        scan.nextLine();
+                    }
                     scan.nextLine();
                     examPointTotal += point;
 
@@ -280,9 +310,19 @@ public class Main {
                     String questionText = scan.nextLine();
 
                     //Instructor can specify how many choices a multiple choice question has
-                    System.out.println("How many choices are there?");
-                    int choiceCount = scan.nextInt();
+                    int choiceCount;
+                    while (true) {
+                        System.out.println("How many choices are there?");
+                        try {
+                            choiceCount = scan.nextInt();
+                            break;
+                        } catch (InputMismatchException IME) {
+                            TextColours.writeYellow("Choice number should be an integer, please try again");
+                        }
+                        scan.nextLine();
+                    }
                     scan.nextLine();
+
 
                     MultipleChoiceAnswer mca = new MultipleChoiceAnswer();
 
@@ -300,7 +340,7 @@ public class Main {
                         System.out.println("Which choice is correct?");
                         choiceCode = scan.nextLine().charAt(0);
 
-                        if ((int) choiceCode > (64 + choiceCount)) {
+                        if ((int) choiceCode > (64 + choiceCount)&&(int) choiceCode <64) {
                             System.out.println("There is no choice " + choiceCode + ". Please enter again.");
                         } else {
                             break;
@@ -314,8 +354,18 @@ public class Main {
                     //this is for storing right answer as String to help grading
                     mca.setRightAnswer(Character.toString(choiceCode));
 
-                    System.out.println("How many points is this question?");
-                    int point = scan.nextInt();
+                    int point;
+                    while (true) {
+                        System.out.println("How many points is this question?");
+
+                        try {
+                            point = scan.nextInt();
+                            break;
+                        } catch (InputMismatchException IME) {
+                            TextColours.writeYellow("Grade should be an integer, please try again");
+                        }
+                        scan.nextLine();
+                    }
                     scan.nextLine();
                     examPointTotal += point;
 
@@ -324,17 +374,36 @@ public class Main {
                 }
                 case 3 -> {
                     System.out.println("Question: ");
-                    //scan.nextLine();
                     String questionText = scan.nextLine();
 
-                    System.out.println("Right Answer: ");
-                    //scan.nextLine();
-                    char answer = scan.nextLine().charAt(0);
+                    char solution;
+                    while (true){
+                        System.out.println("Correct Answer: ");
+                        solution = scan.nextLine().charAt(0);
 
-                    TrueFalseAnswer tfa = new TrueFalseAnswer(answer);
+                        if (solution=='T'||solution=='F'){
+                            break;
+                        }
+                        else{
+                            TextColours.writeYellow("You should enter either T or F, please try again");
+                        }
+                    }
 
-                    System.out.println("How many points is this question?");
-                    int point = scan.nextInt();
+
+                    TrueFalseAnswer tfa = new TrueFalseAnswer(solution);
+
+                    int point;
+                    while (true) {
+                        System.out.println("How many points is this question?");
+
+                        try {
+                            point = scan.nextInt();
+                            break;
+                        } catch (InputMismatchException IME) {
+                            TextColours.writeYellow("Grade should be an integer, please try again");
+                        }
+                        scan.nextLine();
+                    }
                     scan.nextLine();
                     examPointTotal += point;
 
@@ -383,7 +452,15 @@ public class Main {
             System.out.println("3) Exit the system");
 
             Scanner scan = new Scanner(System.in);
-            int signingChoice = scan.nextInt();
+
+            int signingChoice;
+            try {
+                signingChoice = scan.nextInt();
+            } catch (InputMismatchException IME) {
+                TextColours.writeYellow("You are required to enter an integer.");
+                continue;
+            }
+
 
             switch (signingChoice) {
                 case 1 -> {
@@ -395,7 +472,13 @@ public class Main {
                     System.out.println("3) Cancel registration");
 
                     //User chooses what he/she wants to sign up as:
-                    int signingUpChoice = scan.nextInt();
+                    int signingUpChoice;
+                    try {
+                        signingUpChoice = scan.nextInt();
+                    } catch (InputMismatchException IME) {
+                        TextColours.writeYellow("You are required to enter an integer.");
+                        continue;
+                    }
 
                     if (signingUpChoice == 3) {
                         break;
@@ -404,29 +487,29 @@ public class Main {
                     if (signingUpChoice == 1 || signingUpChoice == 2) {
                         int ID;
                         while (true) {
-                            System.out.println("School ID: ");
+                            System.out.print("School ID: ");
                             scan.nextLine();
                             try {
                                 ID = scan.nextInt();
                                 scan.nextLine();
                                 break;
                             } catch (InputMismatchException IME) {
-                                System.out.println("ID should be a number, please try again.");
+                                TextColours.writeYellow("ID should be a number, please try again.");
                             }
                         }
 
-                        System.out.println("Password: ");
+                        System.out.print("Password: ");
                         String password = scan.nextLine();
-                        System.out.println("Name: ");
+                        System.out.print("Name: ");
                         String name = scan.nextLine();
-                        System.out.println("Surname: ");
+                        System.out.print("Surname: ");
                         String surname = scan.nextLine();
 
                         switch (signingUpChoice) {
                             case 1 -> db.registerInstructor(name, surname, ID, password);
                             case 2 -> db.registerStudent(name, surname, ID, password);
                         }
-                    } else System.out.println("Invalid choice.");
+                    } else TextColours.writeYellow("Invalid choice.");
 
 
                 }
@@ -435,10 +518,23 @@ public class Main {
                         System.out.println("No account created for Exam Management System yet. Please create an account for logging in.");
                         continue;
                     }
-                    System.out.println("School ID: ");
-                    int ID = scan.nextInt();
+
+
+                    int ID;
+                    while (true) {
+                        System.out.print("School ID: ");
+                        try {
+                            ID = scan.nextInt();
+                            break;
+                        } catch (InputMismatchException IMex) {
+                            TextColours.writeYellow("ID should be a number, please try again.");
+                        }
+                        scan.nextLine();
+                    }
                     scan.nextLine();
-                    System.out.println("Password: ");
+
+
+                    System.out.print("Password: ");
                     String password = scan.nextLine();
                     try {
                         user = db.logIn(ID, password);
@@ -455,7 +551,7 @@ public class Main {
                     System.out.println("Thank you for using Exam Management System. \nExiting...");
                     System.exit(0);
                 }
-                default -> System.out.println("Invalid choice.");
+                default -> TextColours.writeYellow("Invalid choice.");
             }
             if (isSignedIn) {
                 return user;
@@ -469,10 +565,10 @@ public class Main {
             String date = scan.nextLine();
             String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
             if (splitDate == null) {
-                System.out.println("Please enter a valid date");
+                TextColours.writeYellow("Please enter a valid date");
             } else {
                 if (splitDate.length != 3) {
-                    System.out.println("Please enter a valid date");
+                    TextColours.writeYellow("Please enter a valid date");
                     continue;
                 }
                 int[] dateParts = new int[3];
@@ -490,17 +586,16 @@ public class Main {
                         hour = Integer.parseInt(splitTime[0]);
                         minute = Integer.parseInt(splitTime[1]);
                     } else {
-                        System.out.println("Please enter a valid time");
+                        TextColours.writeYellow("Please enter a valid time");
                         continue;
                     }
 
                     if (hour > 23 || hour < 0 || minute > 60 || minute < 0) {
-                        System.out.println("Please enter a valid time");
+                        TextColours.writeYellow("Please enter a valid time");
                     } else break;
-                    TextColours.writeBlue("We are stuck");
                 }
 
-                exam.SetDateAndTime(dateParts,hour, minute);
+                exam.SetDateAndTime(dateParts, hour, minute);
                 break;
             }
         }
@@ -562,7 +657,8 @@ public class Main {
         //John gives course BIO 101.
         try {
             db.AddCourse(instructorJ.AddAndReturnCourse("BIO 101"));
-            db.AddCourse(instructorW.AddAndReturnCourse("BIO 101"));
+            db.AddCourse(instructorJ.AddAndReturnCourse("MATH 101"));
+            instructorW.AddAndReturnCourse("BIO 101");
         } catch (CourseAlreadyExistsException | IOException e) {
             e.printStackTrace();
         } /*catch (IOException e) {
@@ -572,12 +668,17 @@ public class Main {
         //Gerard, Alice and Cheryll takes course BIO 101.
         try {
             studentG.enrollCourse(db.FindCourse("BIO 101"));
+            studentG.enrollCourse(db.FindCourse("MATH 101"));
             studentA.enrollCourse(db.FindCourse("BIO 101"));
             studentC.enrollCourse(db.FindCourse("BIO 101"));
         } catch (CourseNotFoundException e) {
             e.printStackTrace();
         }
 
+
+    }
+
+    public static Exam[] IMPORT_DEFAULT_EXAMS() {
         //BIO EXAM:
         Exam exam = new Exam();
         String classicalQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
@@ -613,17 +714,30 @@ public class Main {
 
         exam.SetPoint(100);
         exam.EditType("Midterm");
-        exam.SetDateAndTime(new int[]{6, 6, 2022},10,50);
+        exam.SetDateAndTime(new int[]{6, 6, 2022}, 10, 50);
 
+
+        //MATH 101
+        Exam exam2 = new Exam();
+        String classicalQuestion3 = "2*9+5";
+        Answer classicalAnswer3 = new ClassicalAnswer("23");
+        exam2.AddQuestion(classicalQuestion3, classicalAnswer3, 40, false);
+
+        exam2.SetPoint(40);
+        exam2.EditType("Midterm");
+        exam2.SetDateAndTime(new int[]{5, 4, 2022}, 15, 20);
+
+        return new Exam[]{exam, exam2};
+        /*Database db = Database.getInstance();
         try {
             db.FindCourse("BIO 101").AddExam(exam);
+            db.FindCourse("MATH 101").AddExam(exam2);
+
         } catch (CourseNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-
+        }*/
     }
 
 }
