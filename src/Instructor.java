@@ -107,7 +107,7 @@ public class Instructor extends User {
                 String courseName = scan.nextLine();
                 String oldCourseName = course.getName();
 
-                //Changing the name of the course in its relative text file (instructorsID_CourseList.txt) requires 4 steps:
+                //Changing the name of the course in its relative text file (instructorsID_CourseList.txt) requires 3 steps:
                 //STEP 1: Changing its name in the CourseList.txt (the text file which stores all courses)
                 BufferedReader reader = new BufferedReader(new FileReader("CourseList.txt"));
                 ArrayList<String> allLines = new ArrayList<>();
@@ -135,31 +135,35 @@ public class Instructor extends User {
                 }
                 courseWriter.close();
 
-                //STEP 4: Change the name of the course in student files (studentID_CourseList)
+                //STEP 2: Change the name of the course in all the user files (userID_CourseList) that is taking/giving
+                //this course
                 Database db = Database.getInstance();
                 for (User user : db.userList) {
-                    if (user instanceof Student) {
-                        Student student = (Student) user;
-                        if (student.isTakingCourse(oldCourseName)) {
-                            TextColours.writeRed("Taking course");
-                            File studentCourseFile = new File(student.getSchoolID() + "_CourseList.txt");
+                    if (user.isInCourseList(oldCourseName)) {
+                        File userCourseFile = new File(user.getSchoolID() + "_CourseList.txt");
 
-                            //All courses are read from the student's course file
-                            BufferedReader examReader = new BufferedReader(new FileReader(studentCourseFile));
-                            ArrayList<String> exams = new ArrayList<>();
-                            String studentCourse = "";
-                            while ((studentCourse = examReader.readLine()) != null) {
-                                exams.add(studentCourse);
-                            }
-                            examReader.close();
-                            FileWriter studentCourseWriter = new FileWriter(studentCourseFile, true);
-
-                            for (String e : exams) {
-                                studentCourseWriter.write(e);
-                            }
-                            studentCourseWriter.close();
-
+                        //All courses are read from the user's course file
+                        BufferedReader userCourseReader = new BufferedReader(new FileReader(userCourseFile));
+                        ArrayList<String> userCourses = new ArrayList<>();
+                        String userCourse = "";
+                        while ((userCourse = userCourseReader.readLine()) != null) {
+                            userCourses.add(userCourse);
                         }
+                        userCourseReader.close();
+                        FileWriter userCourseWriter = new FileWriter(userCourseFile);
+
+                        for (int i = 0; i < userCourses.size(); i++) {
+                            if (userCourses.get(i).equals(course.getName())) {
+                                userCourses.set(i, courseName);
+                            }
+                        }
+
+                        for (String UC : userCourses) {
+                            userCourseWriter.write(UC + System.getProperty("line.separator"));
+                        }
+                        userCourseWriter.close();
+
+
                     }
                 }
 
@@ -167,11 +171,11 @@ public class Instructor extends User {
                 course.setName(courseName);
 
                 //STEP 2: Course name is changed in instructor's course list text (instructorID_CourseList.txt)
-                FileWriter localCourseWriter = new FileWriter(getSchoolID() + "_CourseList.txt");
+                /*FileWriter localCourseWriter = new FileWriter(getSchoolID() + "_CourseList.txt");
                 for (Course replacingLine : courseList) {
                     localCourseWriter.write(replacingLine.getName() + System.getProperty("line.separator"));
                 }
-                localCourseWriter.close();
+                localCourseWriter.close();*/
 
                 //STEP 3: Course's exam List text file is changed
                 //Every course has en exam list text file relative to their names (name_ExamList.txt)
@@ -190,9 +194,9 @@ public class Instructor extends User {
                     while ((exam = examReader.readLine()) != null) {
                         exams.add(exam);
                     }
-                    System.out.println("HERE ARE EXAMS: " + exams);
                     examReader.close();
 
+                    //All exams are migrated to the new file
                     for (String e : exams) {
                         newCourseWriter.write(e);
                     }

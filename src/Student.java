@@ -75,15 +75,4 @@ public class Student extends User {
             }
         }
     }
-
-    //EXPERIMENTAL ADDITION
-    public boolean isTakingCourse(String courseName){
-        try{
-            FindCourse(courseName);
-            return true;
-        }
-        catch (CourseNotFoundException CNFE){
-            return false;
-        }
-    }
 }

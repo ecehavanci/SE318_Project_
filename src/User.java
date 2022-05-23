@@ -85,4 +85,15 @@ public abstract class User {
         }
         return count;
     }
+
+    //EXPERIMENTAL ADDITION
+    public boolean isInCourseList(String courseName){
+        try{
+            FindCourse(courseName);
+            return true;
+        }
+        catch (CourseNotFoundException CNFE){
+            return false;
+        }
+    }
 }
