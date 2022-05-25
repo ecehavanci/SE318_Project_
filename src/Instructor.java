@@ -314,7 +314,7 @@ public class Instructor extends User {
                             System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
                             System.out.println();
 
-                            System.out.println("Right Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
+                            System.out.println("Correct Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
                             System.out.println();
 
                             System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
@@ -339,6 +339,7 @@ public class Instructor extends User {
                             for (int k = 0; k < sheets.get(i).getGradeList().size(); k++) {
                                 if (sheets.get(i).getGradeList().get(k) == -1) {
                                     sheets.get(i).getGradeList().set(k, point);
+                                    break;
                                 }
                             }
 
@@ -368,7 +369,6 @@ public class Instructor extends User {
                         scan.nextLine();
                     }
                     scan.nextLine();
-                    scan.nextLine();
 
                     if (approval == 1) {
                         sheets.get(i).setApproved(true);
@@ -383,7 +383,6 @@ public class Instructor extends User {
     }
 
     public void ShowExamStatistics(String courseName, int examIndex) {
-        //TODO: Show exam statistics
         ArrayList<StudentSheet> sheets = null;
         List<QuestionAndAnswer> QnA_List = null;
         Exam exam = null;
@@ -411,10 +410,10 @@ public class Instructor extends User {
                     grades[j] += sheets.get(i).getGradeList().get(j);
                 }
             }
-            System.out.println("Average: " + totalPoints / sheets.size());
+            System.out.println("Average: " + (double)(totalPoints / sheets.size()));
 
             for (int i = 0; i < grades.length; i++) {
-                System.out.println(i + "th question average: " + grades[i] / sheets.size());
+                System.out.println("Question " + (i+1) + "'s average: " + (double)(grades[i] / sheets.size()));
             }
         }
     }

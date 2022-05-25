@@ -20,14 +20,14 @@ public class Main {
         System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
         //ADDITIONALLY THIS METHOD IS USING AN UNOFFICIAL SIGNING UP METHOD WHICH MEANS IT SHOULD ONLY BE RUN ONCE THEN COMMENTED
-        IMPORT_DEFAULTS();
+        /*IMPORT_DEFAULTS();
         Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
         database.courseList.get(0).AddExam(defaultExams[0]);
         database.courseList.get(1).AddExam(defaultExams[1]);
         File exam_QnA_List1 = new File("BIO 101" + "_" + 0 + "_QnA_List.txt");
         exam_QnA_List1.createNewFile();
         File exam_QnA_List2 = new File("MATH 101" + "_" + 0 + "_QnA_List.txt");
-        exam_QnA_List2.createNewFile();
+        exam_QnA_List2.createNewFile();*/
 
 
         while (true) {
@@ -194,9 +194,14 @@ public class Main {
                             instructor.GradeUnevaluatedQuestions(courseName, examIndex);
                         }
                         case 5 -> {
-                            System.out.println("Which course's would you like to see the average grade?");
+                            System.out.println("Which course's exam would you like to see the average grade of?");
                             String courseName = scan.nextLine();
 
+                            try {
+                                instructor.FindCourse(courseName).ShowExamDetails();
+                            } catch (CourseNotFoundException e) {
+                                TextColours.writeYellow("Course with given name does not exist in your courses. You can add that course or add yourself as an instructor if another instructor is already giving that course.");
+                            }
 
                             int examIndex;
                             while (true) {
@@ -260,7 +265,7 @@ public class Main {
         //We sequentially add questions (along with their answers if desired) to the exam
         while (true) {
             System.out.println("What kind of question would you like to add?");
-            System.out.println("1) Classical type question (open ended)");
+            System.out.println("1) Text based question (open ended)");
             System.out.println("2) Multiple choice question");
             System.out.println("3) True/False question");
             System.out.println("4) Finish exam building");
@@ -290,7 +295,7 @@ public class Main {
                     }
 
 
-                    System.out.println("Would you like to enter an answer to this classical question to help you grading? Yes/No ");
+                    System.out.println("Would you like to enter an answer to this text based question to help you grading? Yes/No ");
                     String answerChoice = scan.nextLine();
                     answerChoice = answerChoice.toUpperCase(Locale.ROOT);
 
@@ -324,8 +329,8 @@ public class Main {
                     scan.nextLine();
                     examPointTotal += point;
 
-                    //A classical question (and its answer if desired) is created since choice 1 indicates classical question
-                    ClassicalAnswer ca = new ClassicalAnswer(answerText);
+                    //A text based question (and its answer if desired) is created since choice 1 indicates text based question
+                    TextBasedAnswer ca = new TextBasedAnswer(answerText);
                     exam.AddQuestion(questionText, ca, point, false);
 
                     //Text based question is stored temporarily: t stands for "text based"
@@ -740,10 +745,10 @@ public class Main {
     public static Exam[] IMPORT_DEFAULT_EXAMS() {
         //BIO EXAM:
         Exam exam = new Exam();
-        String classicalQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
-        Answer classicalAnswer1 = new ClassicalAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
-        classicalAnswer1.setRightAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
-        exam.AddQuestion(classicalQuestion1, classicalAnswer1, 30, false);
+        String textBasedQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
+        Answer textBasedAnswer1 = new TextBasedAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
+        textBasedAnswer1.setRightAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
+        exam.AddQuestion(textBasedQuestion1, textBasedAnswer1, 30, false);
 
         String trueFalseQuestion1 = "Mushrooms are classified as plants.";
         Answer trueFalseAnswer1 = new TrueFalseAnswer('F');
@@ -767,9 +772,9 @@ public class Main {
 
         exam.AddQuestion(multipleChoiceQuestion1, multipleChoiceAnswer1, 10, true);
 
-        String classicalQuestion2 = "Summarize Lamarckian Eveolution in 2-3 sentences and give an example.";
-        Answer classicalAnswer2 = new ClassicalAnswer("");
-        exam.AddQuestion(classicalQuestion2, classicalAnswer2, 45, false);
+        String textBasedQuestion2 = "Summarize Lamarckian Eveolution in 2-3 sentences and give an example.";
+        Answer textBasedAnswer2 = new TextBasedAnswer("");
+        exam.AddQuestion(textBasedQuestion2, textBasedAnswer2, 45, false);
 
         exam.SetPoint(100);
         exam.EditType("Midterm");
@@ -778,9 +783,9 @@ public class Main {
 
         //MATH 101
         Exam exam2 = new Exam();
-        String classicalQuestion3 = "2*9+5";
-        Answer classicalAnswer3 = new ClassicalAnswer("23");
-        exam2.AddQuestion(classicalQuestion3, classicalAnswer3, 40, false);
+        String textBasedQuestion3 = "2*9+5";
+        Answer textBasedAnswer3 = new TextBasedAnswer("23");
+        exam2.AddQuestion(textBasedQuestion3, textBasedAnswer3, 40, false);
 
         exam2.SetPoint(40);
         exam2.EditType("Midterm");

@@ -25,11 +25,11 @@ public abstract class Answer {
     }
 }
 
-class ClassicalAnswer extends Answer {
+class TextBasedAnswer extends Answer {
     private final String text;
 
     //A classical answer can be blank or a text might be given
-    ClassicalAnswer(String answerText) {
+    TextBasedAnswer(String answerText) {
         text = answerText;
         correctAnswer="undefined";
     }
@@ -76,7 +76,7 @@ class MultipleChoiceAnswer extends Answer {
         for (Choice c : choices) {
             if (c.isRight) return c.text;
         }
-        System.out.println("Please report to instructor this question is marked with NO right answer.");
+        TextColours.writeRed("Please report to instructor this question is marked with NO right answer.");
         return "NO RIGHT ANSWER";
     }
 }
