@@ -31,15 +31,20 @@ public class Course {
         //It is added to a new line in the following manner: ID,type,day.month.year.hour.minute,point
         FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
         boolean willAddLesson = true;
-        for (Exam ex : examList){
-            if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())){
-                willAddLesson=false;
+        for (Exam ex : examList) {
+            if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())) {
+                willAddLesson = false;
             }
         }
 
-        if (willAddLesson){
+        if (willAddLesson) {
             examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
             examList.add(exam);
+
+            //Exam's question and answer storing file is created here
+            File exam_QnA_List = new File(name + "_" + exam.GetID() + "_QnA_List.txt");
+
+            System.out.println(exam_QnA_List.createNewFile());
         }
         examWriter.close();
     }
@@ -99,7 +104,6 @@ public class Course {
 
         System.out.println();
     }
-
 
 
     //This function is for printing Lesson with info of it (its name, its instrutor's name details -exam list-)

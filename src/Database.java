@@ -191,7 +191,7 @@ public class Database {
                         Course c = null;
                         try {
                             c = instructor.AddAndReturnCourse(dataArray2[0]);
-                            if (!DoesCourseExists(c.getName())){
+                            if (!DoesCourseExists(c.getName())) {
                                 courseList.add(c);
                             }
 
@@ -199,27 +199,27 @@ public class Database {
 
                             BufferedReader examReader = new BufferedReader(new FileReader(c.getName() + "_ExamsList.txt"));
                             String examLine;
-                            while ((examLine = examReader.readLine()) != null){
+                            while ((examLine = examReader.readLine()) != null) {
                                 String[] examInfo = examLine.split(",");
                                 Exam exam = new Exam();
 
                                 exam.SetType(examInfo[1]);
-                                String [] dateInfo = examInfo[2].split("\\.");
-                                int [] dateInfoAsInt = new int[dateInfo.length];
-                                for (int i = 0; i <dateInfo.length ; i++) {
+                                String[] dateInfo = examInfo[2].split("\\.");
+                                int[] dateInfoAsInt = new int[dateInfo.length];
+                                for (int i = 0; i < dateInfo.length; i++) {
                                     dateInfoAsInt[i] = Integer.parseInt(dateInfo[i]);
                                 }
-                                int [] dateArray = new int[]{dateInfoAsInt[0],dateInfoAsInt[1],dateInfoAsInt[2]};
+                                int[] dateArray = new int[]{dateInfoAsInt[0], dateInfoAsInt[1], dateInfoAsInt[2]};
 
-                                exam.SetDateAndTime(dateArray,dateInfoAsInt[3],dateInfoAsInt[4]);
+                                exam.SetDateAndTime(dateArray, dateInfoAsInt[3], dateInfoAsInt[4]);
                                 exam.SetPoint(Integer.parseInt(examInfo[3]));
                                 boolean willAddLesson = true;
-                                for (Exam ex : c.GetExamList()){
-                                    if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())){
-                                        willAddLesson=false;
+                                for (Exam ex : c.GetExamList()) {
+                                    if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())) {
+                                        willAddLesson = false;
                                     }
                                 }
-                                if (willAddLesson){
+                                if (willAddLesson) {
                                     c.GetExamList().add(exam);
                                 }
 
@@ -388,23 +388,24 @@ class TextColours {
     public static final String yellow = "\u001B[33m";
     public static final String reset = "\u001B[0m";
 
-    public static void writeBlue(String text){
+    public static void writeBlue(String text) {
         System.out.println(blue + text + reset);
     }
 
-    public static void writeRed(String text){
+    public static void writeRed(String text) {
         System.out.println(red + text + reset);
+
     }
-    public static void writePurple(String text){
+
+    public static void writePurple(String text) {
         System.out.println(purple + text + reset);
     }
-    public static void writeGreen(String text){
+
+    public static void writeGreen(String text) {
         System.out.println(green + text + reset);
     }
-    public static void writeYellow(String text){
+
+    public static void writeYellow(String text) {
         System.out.println(yellow + text + reset);
     }
-
-
-
 }

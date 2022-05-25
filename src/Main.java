@@ -1,8 +1,5 @@
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Main {
@@ -23,10 +20,14 @@ public class Main {
         System.out.println("~Welcome to Exam Management System~");
         //THIS METHOD HAS NOTHING TO DO WITH ACTUAL SYSTEM IMPLEMENTATION AND IS ONLY FOR DEBUGGING PURPOSES
         //ADDITIONALLY THIS METHOD IS USING AN UNOFFICIAL SIGNING UP METHOD WHICH MEANS IT SHOULD ONLY BE RUN ONCE THEN COMMENTED
-        //IMPORT_DEFAULTS();
-        /*Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
-        database.courseList.get(0).GetExamList().add(defaultExams[0]);
-        database.courseList.get(1).GetExamList().add(defaultExams[1]);*/
+        IMPORT_DEFAULTS();
+        Exam[] defaultExams = IMPORT_DEFAULT_EXAMS();
+        database.courseList.get(0).AddExam(defaultExams[0]);
+        database.courseList.get(1).AddExam(defaultExams[1]);
+        File exam_QnA_List1 = new File("BIO 101" + "_" + 0 + "_QnA_List.txt");
+        exam_QnA_List1.createNewFile();
+        File exam_QnA_List2 = new File("MATH 101" + "_" + 0 + "_QnA_List.txt");
+        exam_QnA_List2.createNewFile();
 
 
         while (true) {
@@ -247,6 +248,15 @@ public class Main {
         boolean isCancel = false;
         int examPointTotal = 0;
 
+        //Adding exam is done when every question is completed. Storing files are created after all questions are
+        //created, when exam is added to a course's examlist. so questions are stored temporarily in this list to
+        //allow adding the question to the exam with right ID lately.
+
+        //Texts can contain various punctuation marks like ",", ".", "?". One of the least usable sign should be
+        //"@", so instructor is forced not to use "@" and it is used by us for, storing and separating while reading data
+        //Whether it will be exaluated directly or not, is not stored because we can understand it looking the questionType
+        ArrayList<String> storingExam_QnA_Data = new ArrayList<>();
+
         //We sequentially add questions (along with their answers if desired) to the exam
         while (true) {
             System.out.println("What kind of question would you like to add?");
@@ -257,11 +267,10 @@ public class Main {
             System.out.println("5) Cancel exam building");
 
             int examChoice;
-            try{
+            try {
                 examChoice = scan.nextInt();
                 scan.nextLine();
-            }
-            catch (InputMismatchException IME){
+            } catch (InputMismatchException IME) {
                 TextColours.writeYellow("You should enter an integer, please try again.");
                 continue;
             }
@@ -270,7 +279,16 @@ public class Main {
                 case 1 -> {
                     //Question to be stored:
                     System.out.println("Question: ");
-                    String questionText = scan.nextLine();
+                    String questionText;
+                    while (true) {
+                        questionText = scan.nextLine();
+                        if (questionText.contains("@")) {
+                            System.out.println("\"@\" is invalid character for a question, please try to rewrite the question without \"@\".");
+                            continue;
+                        }
+                        break;
+                    }
+
 
                     System.out.println("Would you like to enter an answer to this classical question to help you grading? Yes/No ");
                     String answerChoice = scan.nextLine();
@@ -280,7 +298,15 @@ public class Main {
                     if (answerChoice.equals("YES")) {
                         //Answer to be stored along with the question:
                         System.out.println("Please enter the answer");
-                        answerText = scan.nextLine();
+                        while (true) {
+                            answerText = scan.nextLine();
+                            if (answerText.contains("@")) {
+                                TextColours.writeYellow("\"@\" is invalid character for an answer, please try to rewrite the question without \"@\".");
+                                continue;
+                            }
+                            break;
+                        }
+
                     }
 
                     int point;
@@ -301,6 +327,10 @@ public class Main {
                     //A classical question (and its answer if desired) is created since choice 1 indicates classical question
                     ClassicalAnswer ca = new ClassicalAnswer(answerText);
                     exam.AddQuestion(questionText, ca, point, false);
+
+                    //Text based question is stored temporarily: t stands for "text based"
+                    //Storing mechanism is as follows: questionType@question@answer@point
+                    storingExam_QnA_Data.add("t@" + questionText + "@" + answerText + "@" + point);
 
 
                 }
@@ -331,6 +361,9 @@ public class Main {
                     for (int i = 0; i < choiceCount; i++) {
                         System.out.println("Enter choice " + (char) (65 + i) + ":");
                         String choice = scan.nextLine();
+                        if (choice.contains("?")){
+                            TextColours.writeYellow("\"?\" is invalid character for a choice, please try to rewrite the question without \"?\".");
+                        }
                         choiceList.add(choice);
                     }
 
@@ -340,7 +373,7 @@ public class Main {
                         System.out.println("Which choice is correct?");
                         choiceCode = scan.nextLine().charAt(0);
 
-                        if ((int) choiceCode > (64 + choiceCount)&&(int) choiceCode <64) {
+                        if ((int) choiceCode > (64 + choiceCount) || (int) choiceCode < 64) {
                             System.out.println("There is no choice " + choiceCode + ". Please enter again.");
                         } else {
                             break;
@@ -371,20 +404,33 @@ public class Main {
 
                     //Multiple choice question is added along with answer and the point of it
                     exam.AddQuestion(questionText, mca, point, true);
+
+                    //Text based question is stored temporarily: m stands for "multiple choice"
+                    //Storing mechanism is as follows: questionType@question@choiceCount@choice1?choice2?...choice100@correctAnswer@point
+                    String allChoices = "";
+                    for (String choice : choiceList){
+                        if (allChoices.equals("")){
+                            allChoices = choice;
+                        }
+                        else{
+                            allChoices = allChoices.concat("?"+choice);
+                        }
+                    }
+                    storingExam_QnA_Data.add("m@" + questionText + "@" +choiceCount+"@"+ allChoices +"@"+ mca.getCorrectAnswer() + "@" + point);
+
                 }
                 case 3 -> {
                     System.out.println("Question: ");
                     String questionText = scan.nextLine();
 
                     char solution;
-                    while (true){
+                    while (true) {
                         System.out.println("Correct Answer: ");
                         solution = scan.nextLine().charAt(0);
 
-                        if (solution=='T'||solution=='F'){
+                        if (solution == 'T' || solution == 'F') {
                             break;
-                        }
-                        else{
+                        } else {
                             TextColours.writeYellow("You should enter either T or F, please try again");
                         }
                     }
@@ -409,6 +455,11 @@ public class Main {
 
                     //True/false question is added along with answer and the point of it
                     exam.AddQuestion(questionText, tfa, point, true);
+
+                    //Text based question is stored temporarily: f stands for "true false"
+                    //Storing mechanism is as follows: questionType@correctAnswer@point
+                    storingExam_QnA_Data.add("f@" + questionText + "@" + tfa.getCorrectAnswer() + "@" + point);
+
                 }
 
                 case 4 -> isDone = true;
@@ -430,9 +481,17 @@ public class Main {
             String examType = scan.nextLine();
             exam.EditType(examType);
 
-            exam.SetPoint(examPointTotal);
+
             try {
                 course.AddExam(exam);
+
+                exam.SetPoint(examPointTotal);
+                FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt",true);
+                for (String QnA_Data : storingExam_QnA_Data){
+                    QnA_Writer.write(QnA_Data + System.getProperty("line.separator"));
+                }
+                QnA_Writer.close();
+
                 System.out.println("Exam is successfully added");
             } catch (Exception e) {
                 System.out.println("An error occurred while adding the exam, please try again later.");

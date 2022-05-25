@@ -12,6 +12,10 @@ public abstract class Answer {
 
     protected String correctAnswer = "";
 
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
+
     public String getRightAnswer() {
         return correctAnswer;
     }
