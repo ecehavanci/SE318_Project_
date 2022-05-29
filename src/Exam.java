@@ -185,5 +185,19 @@ public class Exam {
         return true;
     }
 
+    public StudentSheet FindStudentSheet(Student student){
+        for (StudentSheet ss : studentSheetList){
+            if (ss.getStudent().getSchoolID()==student.getSchoolID()){
+                return ss;
+            }
+        }
+        return null;
+    }
+
+    public boolean isPastDue(){
+        return LocalDateTime.now().isAfter(GetLocalDateTime());
+    }
+
+
 
 }

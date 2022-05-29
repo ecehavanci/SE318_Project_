@@ -18,7 +18,7 @@ public class Student extends User {
         courseList.add(course);
 
         Database db = Database.getInstance();
-        System.out.println(TextColours.blue + getSchoolID() + TextColours.reset);
+        //System.out.println(TextColours.blue + getSchoolID() + TextColours.reset);
         String fileName = getSchoolID() + "_CourseList.txt";
 
         try {
@@ -69,6 +69,26 @@ public class Student extends User {
             for (int j = 0; j < exams; j++) {
                 Exam exam = courseList.get(i).GetExam(j);
                 if (localDate.isBefore(exam.GetLocalDateTime())) {
+                    Course course = courseList.get(i);
+                    course.ShowExamDetailsWithIndex(j);
+                }
+            }
+        }
+    }
+
+    public void getPastDueExams() {
+        System.out.println("Past due exams: ");
+
+        for (int i = 0; i < courseList.size(); i++) {
+            int exams = courseList.get(i).ExamCount();
+
+            if (exams == 0) {
+                System.out.println("Don't have any exams");
+            }
+            LocalDateTime localDate = LocalDateTime.now();
+            for (int j = 0; j < exams; j++) {
+                Exam exam = courseList.get(i).GetExam(j);
+                if (localDate.isAfter(exam.GetLocalDateTime())) {
                     Course course = courseList.get(i);
                     course.ShowExamDetailsWithIndex(j);
                 }

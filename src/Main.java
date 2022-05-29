@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.time.DateTimeException;
 import java.util.*;
 
 public class Main {
@@ -48,10 +49,9 @@ public class Main {
                     System.out.println("1) Enroll/Unenroll in courses");
                     System.out.println("2) List all enrolled course details");
                     System.out.println("3) See all exam informations");
-                    System.out.println("4) Log out");
-
-                    //EXPERIMENTAL ADDITION
-                    System.out.println("5) Take Exam");
+                    System.out.println("4) Take exam");
+                    System.out.println("5) See exam grades");
+                    System.out.println("6) Log out");
 
 
                     int insChoice = scan.nextInt();
@@ -75,11 +75,6 @@ public class Main {
                             seeExamInfo(database, student);
                         }
                         case 4 -> {
-                            System.out.println("Logging out...");
-                            willLogOut = true;
-                        }
-
-                        case 5 -> {
                             //System.out.println("Your upcoming exams:");
                             if (student.ExamCountTotal() > 0) {
                                 student.getUpcomingExams();
@@ -100,7 +95,11 @@ public class Main {
                                         scan.nextLine();
                                         try {
                                             Exam exam = course.GetExam(examIndex - 1);
-                                            exam.Take(student);
+                                            if (!exam.isPastDue()){
+                                                exam.Take(student);
+                                            }
+                                            else System.out.println("This exam is past due." +
+                                                    "");
                                         } catch (IndexOutOfBoundsException IOOBE) {
                                             System.out.println("There is no exam in the given index");
                                         }
@@ -109,6 +108,44 @@ public class Main {
                             } else {
                                 System.out.println("You don't have any exams");
                             }
+                        }
+                        case 5 -> {
+                            student.getPastDueExams();
+
+                            System.out.println("Which course's exam do you want to see grade of?");
+                            String courseName = scan.nextLine();
+                            if (student.ExamCountInCourse(courseName) > 0) {
+                                Course course = null;
+                                try {
+                                    course = database.FindCourse(courseName);
+                                } catch (CourseNotFoundException LNFE) {
+                                    TextColours.writeYellow("Course not found");
+                                }
+
+                                if (course != null) {
+                                    System.out.println("Which exam's grade do you want to see?");
+                                    int examIndex = scan.nextInt();
+                                    scan.nextLine();
+                                    try {
+                                        Exam exam = course.GetExam(examIndex - 1);
+                                        try{
+                                            StudentSheet sheet = exam.FindStudentSheet(student);
+                                            if (sheet.isApproved()){
+                                                System.out.println("Your grade: " + sheet.getGrade());
+                                            }
+                                        }catch (NullPointerException NPE){
+                                            TextColours.writeYellow("System does not contain any data regarding to this exam of yours in this course. If you think there is a problem, please contact with your instructor.");
+                                        }
+                                        exam.FindStudentSheet(student);
+                                    } catch (IndexOutOfBoundsException IOOBE) {
+                                        System.out.println("There is no exam in the given index");
+                                    }
+                                }
+                            }
+                        }
+                        case 6 -> {
+                            System.out.println("Logging out...");
+                            willLogOut = true;
                         }
                     }
                     if (willLogOut) {
@@ -366,7 +403,7 @@ public class Main {
                     for (int i = 0; i < choiceCount; i++) {
                         System.out.println("Enter choice " + (char) (65 + i) + ":");
                         String choice = scan.nextLine();
-                        if (choice.contains("?")){
+                        if (choice.contains("?")) {
                             TextColours.writeYellow("\"?\" is invalid character for a choice, please try to rewrite the question without \"?\".");
                         }
                         choiceList.add(choice);
@@ -413,15 +450,14 @@ public class Main {
                     //Text based question is stored temporarily: m stands for "multiple choice"
                     //Storing mechanism is as follows: questionType@question@choiceCount@choice1?choice2?...choice100@correctAnswer@point
                     String allChoices = "";
-                    for (String choice : choiceList){
-                        if (allChoices.equals("")){
+                    for (String choice : choiceList) {
+                        if (allChoices.equals("")) {
                             allChoices = choice;
-                        }
-                        else{
-                            allChoices = allChoices.concat("?"+choice);
+                        } else {
+                            allChoices = allChoices.concat("?" + choice);
                         }
                     }
-                    storingExam_QnA_Data.add("m@" + questionText + "@" +choiceCount+"@"+ allChoices +"@"+ mca.getCorrectAnswer() + "@" + point);
+                    storingExam_QnA_Data.add("m@" + questionText + "@" + choiceCount + "@" + allChoices + "@" + mca.getCorrectAnswer() + "@" + point);
 
                 }
                 case 3 -> {
@@ -478,7 +514,7 @@ public class Main {
         }
         if (isDone) {
             //When instructor is done with adding the exam questions, he/she has to specify the date and type of the exam
-            System.out.print("Please enter a date: ");
+            System.out.print("Please enter the date of the exam: ");
             SetDate(exam);
 
             //The attribute could be final, quiz, midterm, etc.
@@ -491,8 +527,8 @@ public class Main {
                 course.AddExam(exam);
 
                 exam.SetPoint(examPointTotal);
-                FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt",true);
-                for (String QnA_Data : storingExam_QnA_Data){
+                FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt", true);
+                for (String QnA_Data : storingExam_QnA_Data) {
                     QnA_Writer.write(QnA_Data + System.getProperty("line.separator"));
                 }
                 QnA_Writer.close();
@@ -625,44 +661,50 @@ public class Main {
 
     public static void SetDate(Exam exam) {
         Scanner scan = new Scanner(System.in);
-        while (true) {
-            String date = scan.nextLine();
-            String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
-            if (splitDate == null) {
-                TextColours.writeYellow("Please enter a valid date");
-            } else {
-                if (splitDate.length != 3) {
-                    TextColours.writeYellow("Please enter a valid date");
-                    continue;
-                }
-                int[] dateParts = new int[3];
-                for (int i = 0; i < 3; i++) {
-                    dateParts[i] = Integer.parseInt(splitDate[i]);
-                }
-                int hour;
-                int minute;
-                while (true) {
-                    System.out.print("Please enter the time of the exam (HH:MM): ");
-                    String time = scan.nextLine();
-                    String[] splitTime = time.split(":");
 
-                    if (splitTime.length == 2) {
-                        hour = Integer.parseInt(splitTime[0]);
-                        minute = Integer.parseInt(splitTime[1]);
-                    } else {
-                        TextColours.writeYellow("Please enter a valid time");
+        while (true) {
+            try {
+                String date = scan.nextLine();
+                String[] splitDate = date.contains("/") ? date.split("/") : date.contains(".") ? date.split("\\.") : null;
+                if (splitDate == null) {
+                    TextColours.writeYellow("Please enter the date in a valid format (DD.MM.YYYY or DD/MM/YYYY)");
+                    System.out.print("Please enter the date of the exam: ");
+                } else {
+                    if (splitDate.length != 3) {
+                        TextColours.writeYellow("Please enter the date in a valid format (DD.MM.YYYY or DD/MM/YYYY)");
+                        System.out.print("Please enter the date of the exam: ");
                         continue;
                     }
+                    int[] dateParts = new int[3];
+                    for (int i = 0; i < 3; i++) {
+                        dateParts[i] = Integer.parseInt(splitDate[i]);
+                    }
+                    int hour;
+                    int minute;
+                    while (true) {
+                        System.out.print("Please enter the time of the exam: ");
+                        String time = scan.nextLine();
+                        String[] splitTime = time.split(":");
 
-                    if (hour > 23 || hour < 0 || minute > 60 || minute < 0) {
-                        TextColours.writeYellow("Please enter a valid time");
-                    } else break;
+                        if (splitTime.length == 2) {
+                            hour = Integer.parseInt(splitTime[0]);
+                            minute = Integer.parseInt(splitTime[1]);
+                            break;
+                        } else {
+                            TextColours.writeYellow("Please enter the time in a valid format (HH:MM)");
+                        }
+                    }
+
+
+                    exam.SetDateAndTime(dateParts, hour, minute);
+                    break;
                 }
-
-                exam.SetDateAndTime(dateParts, hour, minute);
-                break;
+            } catch (DateTimeException DTE) {
+                TextColours.writeYellow("Given date/time is invalid, please try again.");
+                System.out.print("Please enter the date of the exam: ");
             }
         }
+
     }
 
     public static void enrollUnroll(Database database, Student student) throws WrongChoiceException {
