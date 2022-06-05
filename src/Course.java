@@ -24,20 +24,20 @@ public class Course {
     }
 
 
-    public void AddExam(Exam exam) throws IOException {
+    public void AddExam(Exam exam) throws IOException, ExamCannotBeAddedException {
         exam.SetID(examList.size());
 
         //Exam is added to its text file: LessonName_ExamList.txt.
         //It is added to a new line in the following manner: ID,type,day.month.year.hour.minute,point
         FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
-        boolean willAddLesson = true;
+        boolean willAddExam = true;
         for (Exam ex : examList) {
             if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())) {
-                willAddLesson = false;
+                willAddExam = false;
             }
         }
 
-        if (willAddLesson) {
+        if (willAddExam) {
             examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
             examList.add(exam);
 
@@ -45,6 +45,9 @@ public class Course {
             File exam_QnA_List = new File(name + "_" + exam.GetID() + "_QnA_List.txt");
 
             System.out.println(exam_QnA_List.createNewFile());
+        }
+        else{
+            throw new ExamCannotBeAddedException();
         }
         examWriter.close();
     }

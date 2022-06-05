@@ -116,6 +116,40 @@ public class Exam {
 
             System.out.print("Answer: ");
             String studentAnswer = scan.nextLine();
+
+            if (QnA.isEvaluatedDirectly()){
+                studentAnswer = studentAnswer.toUpperCase(Locale.ROOT);
+            }
+
+            if (QnA.getAnswer() instanceof MultipleChoiceAnswer){
+                if (studentAnswer.toCharArray().length>1){
+                    TextColours.writeYellow("Please enter the word symbol of the choice(A, B, C, etc.).");
+                    return;
+                }
+
+                MultipleChoiceAnswer mca = (MultipleChoiceAnswer) QnA.getAnswer();
+
+                int lastChoiceInASCII = 65 + mca.getChoiceCount();
+                while((int) studentAnswer.charAt(0) > (lastChoiceInASCII-1) || (int) studentAnswer.charAt(0) < 65){
+                    TextColours.writeYellow("Invalid choice. Please enter a word between A and " + (char)(lastChoiceInASCII-1));
+                    System.out.print("Answer: ");
+                    studentAnswer = scan.nextLine();
+                }
+            }
+
+            if (QnA.getAnswer() instanceof TrueFalseAnswer){
+                if (studentAnswer.toCharArray().length>1){
+                    TextColours.writeYellow("Please enter either T or F.");
+                    return;
+                }
+
+                while(!(studentAnswer.equals("T")||studentAnswer.equals("F"))){
+                    TextColours.writeYellow("Please enter either T or F.");
+                    System.out.print("Answer: ");
+                    studentAnswer = scan.nextLine().toUpperCase(Locale.ROOT);
+                }
+            }
+
             studentAnswers.add(studentAnswer);
 
             System.out.println();

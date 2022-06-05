@@ -174,10 +174,23 @@ public class Main {
                     System.out.println("5) See the average score of the exam");
                     System.out.println("6) Log out");
 
-
                     //They choose what they want to do
-                    int insChoice = scan.nextInt();
-                    scan.nextLine();
+                    int insChoice;
+                    while (true){
+                        try {
+                            insChoice= scan.nextInt();
+                            scan.nextLine();
+                            break;
+                        }
+                        catch (InputMismatchException IME){
+                            TextColours.writeYellow("Please enter an integer.");
+                            System.out.print("Your choice: ");
+                            scan.nextLine();
+                        }
+
+
+                    }
+
 
                     switch (insChoice) {
                         case 1 -> {
@@ -314,6 +327,7 @@ public class Main {
                 scan.nextLine();
             } catch (InputMismatchException IME) {
                 TextColours.writeYellow("You should enter an integer, please try again.");
+                scan.nextLine();
                 continue;
             }
 
@@ -373,6 +387,8 @@ public class Main {
                     //Text based question is stored temporarily: t stands for "text based"
                     //Storing mechanism is as follows: questionType@question@answer@point
                     storingExam_QnA_Data.add("t@" + questionText + "@" + answerText + "@" + point);
+                    System.out.println(point);
+
 
 
                 }
@@ -457,7 +473,8 @@ public class Main {
                             allChoices = allChoices.concat("?" + choice);
                         }
                     }
-                    storingExam_QnA_Data.add("m@" + questionText + "@" + choiceCount + "@" + allChoices + "@" + mca.getCorrectAnswer() + "@" + point);
+                    System.out.println(point);
+                    storingExam_QnA_Data.add("m@" + questionText + "@" + allChoices + "@" + mca.getCorrectAnswer() + "@" + point);
 
                 }
                 case 3 -> {
@@ -501,6 +518,9 @@ public class Main {
                     //Storing mechanism is as follows: questionType@correctAnswer@point
                     storingExam_QnA_Data.add("f@" + questionText + "@" + tfa.getCorrectAnswer() + "@" + point);
 
+                    System.out.println(point);
+
+
                 }
 
                 case 4 -> isDone = true;
@@ -512,30 +532,36 @@ public class Main {
             }
 
         }
-        if (isDone) {
-            //When instructor is done with adding the exam questions, he/she has to specify the date and type of the exam
-            System.out.print("Please enter the date of the exam: ");
-            SetDate(exam);
+        while (true) {
+            if (isDone) {
+                //When instructor is done with adding the exam questions, he/she has to specify the date and type of the exam
+                System.out.print("Please enter the date of the exam: ");
+                SetDate(exam);
 
-            //The attribute could be final, quiz, midterm, etc.
-            System.out.print("Please enter the type of the exam: ");
-            String examType = scan.nextLine();
-            exam.EditType(examType);
-
-
-            try {
-                course.AddExam(exam);
+                //The attribute could be final, quiz, midterm, etc.
+                System.out.print("Please enter the type of the exam: ");
+                String examType = scan.nextLine();
+                exam.EditType(examType);
 
                 exam.SetPoint(examPointTotal);
-                FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt", true);
-                for (String QnA_Data : storingExam_QnA_Data) {
-                    QnA_Writer.write(QnA_Data + System.getProperty("line.separator"));
-                }
-                QnA_Writer.close();
 
-                System.out.println("Exam is successfully added");
-            } catch (Exception e) {
-                System.out.println("An error occurred while adding the exam, please try again later.");
+                try {
+                    course.AddExam(exam);
+
+                    exam.SetPoint(examPointTotal);
+                    FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt", true);
+                    for (String QnA_Data : storingExam_QnA_Data) {
+                        QnA_Writer.write(QnA_Data + System.getProperty("line.separator"));
+                    }
+                    QnA_Writer.close();
+
+                    System.out.println("Exam is successfully added");
+                    break;
+                } catch (IOException IOE) {
+                    System.out.println("An error occurred while adding the exam, please try again later.");
+                } catch (ExamCannotBeAddedException e) {
+                    TextColours.writeYellow("There is another exam in the same date and time, please re-enter the date and time.");
+                }
             }
         }
     }

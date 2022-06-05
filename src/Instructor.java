@@ -296,11 +296,13 @@ public class Instructor extends User {
 
         }
 
-
         if (QnA_List != null && sheets != null) {
             Scanner scan = new Scanner(System.in);
 
-            if (!exam.AreAllSheetsApproved()) {
+            if(!exam.isPastDue()){
+                TextColours.writeBlue("Exam is not available for students yet.");
+            }
+            else if (!exam.AreAllSheetsApproved()) {
 
                 for (int i = 0; i < sheets.size(); i++) {
                     if (sheets.get(i).isApproved()) continue;

@@ -158,6 +158,7 @@ public class Database {
         //We have a storing system using text files, import function loads the data in text files into corresponding places in system
 
         //First users are loaded into system with their data
+        File userListFile  = new File("UserList.txt");
         BufferedReader userReader = new BufferedReader(new FileReader("UserList.txt"));
         String data;
         while ((data = userReader.readLine()) != null) {
@@ -201,6 +202,7 @@ public class Database {
                             String examLine;
                             while ((examLine = examReader.readLine()) != null) {
                                 String[] examInfo = examLine.split(",");
+
                                 Exam exam = new Exam();
 
                                 exam.SetType(examInfo[1]);
@@ -220,8 +222,35 @@ public class Database {
                                     }
                                 }
                                 if (willAddLesson) {
+                                    //Since database importing should not print out anything I use this method insted of course.AddExam()
                                     c.GetExamList().add(exam);
                                 }
+
+                                BufferedReader questionReader = new BufferedReader(new FileReader(c.getName() + "_" + examInfo[0] + "_QnA_List.txt"));
+                                String questionLine;
+                                while ((questionLine = questionReader.readLine()) != null) {
+                                    String[] questionInfo = questionLine.split("@");
+
+                                    if (questionInfo[0].equals("t")) {//If it is a text based question
+                                        TextBasedAnswer ta = new TextBasedAnswer(questionInfo[2]);
+                                        exam.AddQuestion(questionInfo[1], ta, Integer.parseInt(questionInfo[3]), false);
+                                    } else if (questionInfo[0].equals("m")) {//If it is a multiple choice question
+                                        MultipleChoiceAnswer ma = new MultipleChoiceAnswer();
+
+                                        String[] choiceArr = questionInfo[2].split("\\?");
+                                        for (int i = 0; i < choiceArr.length; i++) {
+                                            ma.addChoice(new Choice(choiceArr[i], 65 + i == (int) questionInfo[3].charAt(0)));
+                                        }
+                                        exam.AddQuestion(questionInfo[1], ma, Integer.parseInt(questionInfo[4]), true);
+                                    } else if (questionInfo[0].equals("f")) {//If it is a true/false question
+                                        TrueFalseAnswer fa = new TrueFalseAnswer(questionInfo[2].charAt(0));
+                                        exam.AddQuestion(questionInfo[1], fa, Integer.parseInt(questionInfo[3]), true);
+                                    }
+                                }
+
+                                //exam.AddQuestion();
+
+                                //exam.AddQuestion();
 
 
                             }
@@ -235,7 +264,7 @@ public class Database {
                 }
 
             } else if (dataArray[0].equals("student")) {
-                int ID = Integer.parseInt(dataArray[2]);
+                int ID = Integer.parseInt(dataArray[1]);
 
                 //Here a student is created with given data in UserList.txt line by line
                 userList.add(new Student(dataArray[3], dataArray[4], ID, dataArray[2]));
@@ -377,6 +406,12 @@ class WrongChoiceException extends Exception {
 
 class UserAlreadyExistsException extends Exception {
     public UserAlreadyExistsException() {
+    }
+}
+
+class ExamCannotBeAddedException extends Exception {
+    public ExamCannotBeAddedException() {
+
     }
 }
 

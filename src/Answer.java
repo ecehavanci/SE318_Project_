@@ -58,6 +58,10 @@ class MultipleChoiceAnswer extends Answer {
         choices.add(choice);
     }
 
+    public int getChoiceCount() {
+        return choices.size();
+    }
+
     //All choices of the question will be printed (with the question)
     @Override
     public void print() {
