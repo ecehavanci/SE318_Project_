@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -8,20 +11,23 @@ import java.util.*;
 public class Exam {
     private int ID; //This is for text-database purposes, it is used while exam editing
     private String type;//midterm, final, quiz etc.
-    private LocalDateTime dateAndTime;
+    private LocalDateTime endDateAndTime;
+    private LocalDateTime startDateAndTime;
+
     private final ArrayList<StudentSheet> studentSheetList = new ArrayList<>();
     private int point;
     private final List<QuestionAndAnswer> QnA_List = new ArrayList<>();
+    private int duration;
 
     public void SetID(int ID) {
         this.ID = ID;
     }
 
-    public int GetID() {
+    public int getID() {
         return ID;
     }
 
-    public List<QuestionAndAnswer> GetQnA_List() {
+    public List<QuestionAndAnswer> getQnA_List() {
         return QnA_List;
     }
 
@@ -29,7 +35,7 @@ public class Exam {
         this.type = type;
     }
 
-    public ArrayList<StudentSheet> GetStudentSheetList() {
+    public ArrayList<StudentSheet> getStudentSheetList() {
         return studentSheetList;
     }
 
@@ -37,17 +43,33 @@ public class Exam {
         this.point = point;
     }
 
-    public int GetPoint() {
+    public int getPoint() {
         return point;
     }
 
-    //Dates are set using an array filled with inputs taken from instructor
-    public void SetDateAndTime(int[] dayMonthYear, int hour, int minute) {
-        dateAndTime = LocalDateTime.of(LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]), LocalTime.of(hour,minute));
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public String GetDateAndTime() {
-        return dateAndTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG));
+    public int getDuration() {
+        return duration;
+    }
+
+    //Dates are set using an array filled with inputs taken from instructor
+    public void SetEndDateAndTime(int[] dayMonthYear, int hour, int minute) {
+        endDateAndTime = LocalDateTime.of(LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]), LocalTime.of(hour, minute));
+    }
+
+    public void SetStartDateAndTime(int[] dayMonthYear, int hour, int minute) {
+        startDateAndTime = LocalDateTime.of(LocalDate.of(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]), LocalTime.of(hour, minute));
+    }
+
+    public LocalDateTime getEndDateAndTime() {
+        return endDateAndTime;
+    }
+
+    public LocalDateTime getStartDateAndTime() {
+        return startDateAndTime;
     }
 
     //Exam type can be edited (for example can be set as midterm but then changed to a quiz)
@@ -56,31 +78,36 @@ public class Exam {
     }
 
     //Returns exam type
-    public String GetType() {
+    public String getType() {
         return type;
     }
 
 
-    //Get date with its day, month, year, day of week
-    public String GetFullDate() {
-        return dateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL));
+    //get date with its day, month, year, day of week
+    public String getFullDate() {
+        return endDateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL));
     }
 
-    //Get date with its day, month, year
-    public String GetLongDate() {
-        return dateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+    //get date with its day, month, year
+    public String getLongDate() {
+        return endDateAndTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
     }
 
-    public String GetTime() {
-        return dateAndTime.getHour() + ":" +dateAndTime.getMinute();
+    public String getEndTime() {
+        return endDateAndTime.getHour() + ":" + endDateAndTime.getMinute();
     }
 
-    public LocalDateTime GetLocalDateTime(){
-        return dateAndTime;
+    public String getStartTime() {
+        return startDateAndTime.getHour() + ":" + startDateAndTime.getMinute();
     }
 
-    public String GetStoringDate() {
-        return dateAndTime.getDayOfMonth() + "." + dateAndTime.getMonthValue() + "." + dateAndTime.getYear() + "." + dateAndTime.getHour() + "." + dateAndTime.getMinute();
+    public LocalDateTime getLocalDateTime() {
+        return endDateAndTime;
+    }
+
+    public String getStoringDate() {
+        return endDateAndTime.getDayOfMonth() + "." + endDateAndTime.getMonthValue() + "." + endDateAndTime.getYear() + "."
+                + endDateAndTime.getHour() + "." + endDateAndTime.getMinute() + "." + startDateAndTime.getHour() + "." + startDateAndTime.getMinute() + "." + duration;
     }
 
 
@@ -89,7 +116,6 @@ public class Exam {
         QuestionAndAnswer QnA = new QuestionAndAnswer(question, answer, point, evaluatedDirectly);
         QnA_List.add(QnA);
     }
-
 
 
     public void PrintQuestions() {
@@ -105,62 +131,97 @@ public class Exam {
     }
 
     //EXPERIMENTAL ADDITION
-    public void Take(Student student) {
-        System.out.println("\n\n~" + type.toUpperCase(Locale.ROOT) + "~\n");
-        Scanner scan = new Scanner(System.in);
-        ArrayList<String> studentAnswers = new ArrayList<>();
-        ArrayList<Integer> gradeList = new ArrayList<>();
+    public void Take(Student student, Course course) throws IOException {
+        if (didStudentTake(student)) {
+            TextColours.writeYellow("You already took the exam.");
+        } else {
+            if (isEarly()) {
+                TextColours.writeYellow("Exam is not available yet.");
+            } else {
+                System.out.println("\n\n~" + type.toUpperCase(Locale.ROOT) + "~\n");
+                Scanner scan = new Scanner(System.in);
+                ArrayList<String> studentAnswers = new ArrayList<>();
+                ArrayList<Integer> gradeList = new ArrayList<>();
 
-        for (QuestionAndAnswer QnA : QnA_List) {
-            QnA.printQuestion();
+                boolean thirtyMinMessage = true;
+                boolean tenMinMessage = true;
+                boolean fiveMinMessage = true;
+                boolean oneMinMessage = true;
 
-            System.out.print("Answer: ");
-            String studentAnswer = scan.nextLine();
 
-            if (QnA.isEvaluatedDirectly()){
-                studentAnswer = studentAnswer.toUpperCase(Locale.ROOT);
-            }
+                for (QuestionAndAnswer QnA : QnA_List) {
+                    QnA.printQuestion();
 
-            if (QnA.getAnswer() instanceof MultipleChoiceAnswer){
-                if (studentAnswer.toCharArray().length>1){
-                    TextColours.writeYellow("Please enter the word symbol of the choice(A, B, C, etc.).");
-                    return;
-                }
+                    if (isPastDue()) {
+                        TextColours.writeYellow("Exam is over.");
+                        break;
+                    }
 
-                MultipleChoiceAnswer mca = (MultipleChoiceAnswer) QnA.getAnswer();
-
-                int lastChoiceInASCII = 65 + mca.getChoiceCount();
-                while((int) studentAnswer.charAt(0) > (lastChoiceInASCII-1) || (int) studentAnswer.charAt(0) < 65){
-                    TextColours.writeYellow("Invalid choice. Please enter a word between A and " + (char)(lastChoiceInASCII-1));
                     System.out.print("Answer: ");
-                    studentAnswer = scan.nextLine();
+                    String studentAnswer = scan.nextLine();
+
+                    if (QnA.isEvaluatedDirectly()) {
+                        studentAnswer = studentAnswer.toUpperCase(Locale.ROOT);
+                    }
+
+                    if (QnA.getAnswer() instanceof MultipleChoiceAnswer) {
+                        if (studentAnswer.toCharArray().length > 1) {
+                            TextColours.writeYellow("Please enter the word symbol of the choice(A, B, C, etc.).");
+                            return;
+                        }
+
+                        MultipleChoiceAnswer mca = (MultipleChoiceAnswer) QnA.getAnswer();
+
+                        int lastChoiceInASCII = 65 + mca.getChoiceCount();
+                        while ((int) studentAnswer.charAt(0) > (lastChoiceInASCII - 1) || (int) studentAnswer.charAt(0) < 65) {
+                            TextColours.writeYellow("Invalid choice. Please enter a word between A and " + (char) (lastChoiceInASCII - 1));
+                            System.out.print("Answer: ");
+                            studentAnswer = scan.nextLine();
+                        }
+                    }
+
+                    if (QnA.getAnswer() instanceof TrueFalseAnswer) {
+                        if (studentAnswer.toCharArray().length > 1) {
+                            TextColours.writeYellow("Please enter either T or F.");
+                            return;
+                        }
+
+                        while (!(studentAnswer.equals("T") || studentAnswer.equals("F"))) {
+                            TextColours.writeYellow("Please enter either T or F.");
+                            System.out.print("Answer: ");
+                            studentAnswer = scan.nextLine().toUpperCase(Locale.ROOT);
+                        }
+                    }
+
+                    studentAnswers.add(studentAnswer);
+                    System.out.println();
                 }
+
+                StudentSheet sheet = new StudentSheet(student, studentAnswers, gradeList);
+                studentSheetList.add(sheet);
+
+                System.out.println("Exam successfully submitted");
+                ShowResult(sheet);
+
+                File file = new File(course.getName() + "_" + getID() + "_" + student.getSchoolID() + "_Sheet.txt");
+                file.createNewFile();
+
+                FileWriter sheetWriter = new FileWriter(file, true);
+
+                for (int i = 0; i < sheet.getGradeList().size(); i++) {
+                    sheetWriter.write(sheet.getAnswer(i) + "#" + sheet.getGradeList().get(i) + System.getProperty("line.separator"));
+                }
+                sheetWriter.close();
+
+                File file2 = new File(course.getName() + "_" + getID() + "_StudentList.txt");
+                FileWriter studentWriter = new FileWriter(file2, true);
+
+                studentWriter.write(student.getSchoolID() + System.getProperty("line.separator"));
+
+                studentWriter.close();
+
             }
-
-            if (QnA.getAnswer() instanceof TrueFalseAnswer){
-                if (studentAnswer.toCharArray().length>1){
-                    TextColours.writeYellow("Please enter either T or F.");
-                    return;
-                }
-
-                while(!(studentAnswer.equals("T")||studentAnswer.equals("F"))){
-                    TextColours.writeYellow("Please enter either T or F.");
-                    System.out.print("Answer: ");
-                    studentAnswer = scan.nextLine().toUpperCase(Locale.ROOT);
-                }
-            }
-
-            studentAnswers.add(studentAnswer);
-
-            System.out.println();
         }
-
-        StudentSheet sheet = new StudentSheet(student, studentAnswers, gradeList);
-        studentSheetList.add(sheet);
-        System.out.println("Exam successfully submitted");
-        ShowResult(sheet);
-
-
     }
 
     //This is for showing a particular student's results
@@ -199,8 +260,7 @@ public class Exam {
             if (Objects.equals(sheet.getAnswer(i), QnA_List.get(i).getAnswer().getRightAnswer())) {
                 sheet.addToGrade(QnA_List.get(i).getPoint());
                 sheet.getGradeList().add(QnA_List.get(i).getPoint());
-            }
-            else{
+            } else {
                 sheet.getGradeList().add(0);
             }
 
@@ -219,19 +279,31 @@ public class Exam {
         return true;
     }
 
-    public StudentSheet FindStudentSheet(Student student){
-        for (StudentSheet ss : studentSheetList){
-            if (ss.getStudent().getSchoolID()==student.getSchoolID()){
+    public StudentSheet FindStudentSheet(Student student) {
+        for (StudentSheet ss : studentSheetList) {
+            if (ss.getStudent().getSchoolID() == student.getSchoolID()) {
                 return ss;
             }
         }
         return null;
     }
 
-    public boolean isPastDue(){
-        return LocalDateTime.now().isAfter(GetLocalDateTime());
+    public boolean isPastDue() {
+        return LocalDateTime.now().isAfter(getLocalDateTime());
     }
 
+    public boolean isEarly() {
+        return LocalDateTime.now().isBefore(getStartDateAndTime());
+    }
+
+    public boolean didStudentTake(Student student) {
+        for (StudentSheet sheet : studentSheetList) {
+            if (student.getSchoolID() == sheet.getStudent().getSchoolID()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 }

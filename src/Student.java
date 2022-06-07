@@ -67,10 +67,14 @@ public class Student extends User {
             }
             LocalDateTime localDate = LocalDateTime.now();
             for (int j = 0; j < exams; j++) {
-                Exam exam = courseList.get(i).GetExam(j);
-                if (localDate.isBefore(exam.GetLocalDateTime())) {
+                Exam exam = courseList.get(i).getExam(j);
+                if (localDate.isBefore(exam.getLocalDateTime())) {
                     Course course = courseList.get(i);
                     course.ShowExamDetailsWithIndex(j);
+                }
+                else{
+                    Course course = courseList.get(i);
+                    System.out.println("EXAM "+ (j+1) + ": " + course.getExam(j).getType() + " is past due.");
                 }
             }
         }
@@ -87,8 +91,8 @@ public class Student extends User {
             }
             LocalDateTime localDate = LocalDateTime.now();
             for (int j = 0; j < exams; j++) {
-                Exam exam = courseList.get(i).GetExam(j);
-                if (localDate.isAfter(exam.GetLocalDateTime())) {
+                Exam exam = courseList.get(i).getExam(j);
+                if (localDate.isAfter(exam.getLocalDateTime())) {
                     Course course = courseList.get(i);
                     course.ShowExamDetailsWithIndex(j);
                 }

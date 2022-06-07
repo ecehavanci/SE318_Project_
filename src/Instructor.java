@@ -255,13 +255,13 @@ public class Instructor extends User {
                             case 1 -> {
                                 System.out.println("What is the new type?");
                                 //1 subtracted here to get the desired index
-                                course.GetExam(editedExamIndex - 1).EditType(scan.nextLine());
+                                course.getExam(editedExamIndex - 1).EditType(scan.nextLine());
                             }
 
                             case 2 -> {
                                 System.out.println("What is the new date?");
                                 //1 subtracted here to get the desired index
-                                Main.SetDate(course.GetExam(editedExamIndex - 1));
+                                Main.SetDate(course.getExam(editedExamIndex - 1));
                             }
                             default -> System.out.println("Cancelling...");
                         }
@@ -284,9 +284,9 @@ public class Instructor extends User {
         try {
             Course course = FindCourse(courseName);
             if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
-                exam = course.GetExam(examIndex - 1);
-                QnA_List = exam.GetQnA_List();
-                sheets = exam.GetStudentSheetList();
+                exam = course.getExam(examIndex - 1);
+                QnA_List = exam.getQnA_List();
+                sheets = exam.getStudentSheetList();
 
             } else {
                 System.out.println("There is no exam by the given index.");
@@ -299,7 +299,7 @@ public class Instructor extends User {
         if (QnA_List != null && sheets != null) {
             Scanner scan = new Scanner(System.in);
 
-            if(!exam.isPastDue()){
+            if(exam.isEarly()){
                 TextColours.writeBlue("Exam is not available for students yet.");
             }
             else if (!exam.AreAllSheetsApproved()) {
@@ -311,42 +311,47 @@ public class Instructor extends User {
                     System.out.println(studentName + "'s sheet:\n");
 
                     for (int j = 0; j < QnA_List.size(); j++) {
-                        if (!QnA_List.get(j).isEvaluatedDirectly()) {
-                            System.out.println("Unevaluated question: QUESTION " + (j + 1));
-                            System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
-                            System.out.println();
+                        try {
+                            if (!QnA_List.get(j).isEvaluatedDirectly()) {
+                                System.out.println("Unevaluated question: QUESTION " + (j + 1));
+                                System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
+                                System.out.println();
 
-                            System.out.println("Correct Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
-                            System.out.println();
+                                System.out.println("Correct Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
+                                System.out.println();
 
-                            System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
-                            System.out.println();
+                                System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
+                                System.out.println();
 
-                            int point;
-                            while (true) {
-                                System.out.println("Grade the answer out of " + QnA_List.get(j).getPoint());
+                                int point;
+                                while (true) {
+                                    System.out.println("Grade the answer out of " + QnA_List.get(j).getPoint());
 
-                                try {
-                                    point = scan.nextInt();
-                                    break;
-                                } catch (InputMismatchException IME) {
-                                    TextColours.writeYellow("Grade should be an integer, please try again");
+                                    try {
+                                        point = scan.nextInt();
+                                        break;
+                                    } catch (InputMismatchException IME) {
+                                        TextColours.writeYellow("Grade should be an integer, please try again");
+                                    }
+                                    scan.nextLine();
                                 }
                                 scan.nextLine();
-                            }
-                            scan.nextLine();
 
-                            sheets.get(i).addToGrade(point);
+                                sheets.get(i).addToGrade(point);
 
-                            for (int k = 0; k < sheets.get(i).getGradeList().size(); k++) {
-                                if (sheets.get(i).getGradeList().get(k) == -1) {
-                                    sheets.get(i).getGradeList().set(k, point);
-                                    break;
+                                for (int k = 0; k < sheets.get(i).getGradeList().size(); k++) {
+                                    if (sheets.get(i).getGradeList().get(k) == -1) {
+                                        sheets.get(i).getGradeList().set(k, point);
+                                        break;
+                                    }
                                 }
-                            }
 
-                            System.out.println();
-                            System.out.println();
+                                System.out.println();
+                                System.out.println();
+                            }
+                        }
+                        catch (IndexOutOfBoundsException IOOBE){
+                            TextColours.writePurple("Question is not answered.");
                         }
                     }
 
@@ -392,8 +397,8 @@ public class Instructor extends User {
         try {
             Course course = FindCourse(courseName);
             if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
-                exam = course.GetExam(examIndex - 1);
-                sheets = exam.GetStudentSheetList();
+                exam = course.getExam(examIndex - 1);
+                sheets = exam.getStudentSheetList();
 
             } else {
                 TextColours.writeYellow("There is no exam by the given index.");

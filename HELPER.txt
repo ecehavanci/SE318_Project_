@@ -23,10 +23,17 @@ STORING A PARTICULAR USER'S COURSES:
 System allows us to find a lesson only from the name, so here courses are stored only with their names. So to courses to be stored in the
 general courses list with full information (their name, instructorsText, examsText) is enough.
 
+STORING EXAMS:
+Exams are stored in their relative name_ExamList.txt in the following manner: index,type,day.month.year.hourEnd.minuteEnd.hourStart.minuteStart.duration,point
+Their questions are stored in their relative name_examIndex_QnA_List.txt in 3 ways.
+-If text based question: t@question@correctAnswer@point
+-If multiple choice question: m@question@choice1?choice2...?choice100@correctChoice@point
+-If true false question: f@question@correctAnswer@point
 
+STORING SHEETS:
+Sheets are stored in their relative courseName_examID_studentSchoolID()_Sheet.txt
+They are stored in the following manner
 
-****ERROR HELPER PART****
-it tells 0_instructor because you are storing indexes instead of names in 1_courselist
 
 
 

@@ -1,8 +1,5 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -213,17 +210,20 @@ public class Database {
                                 }
                                 int[] dateArray = new int[]{dateInfoAsInt[0], dateInfoAsInt[1], dateInfoAsInt[2]};
 
-                                exam.SetDateAndTime(dateArray, dateInfoAsInt[3], dateInfoAsInt[4]);
+                                exam.SetEndDateAndTime(dateArray, dateInfoAsInt[3], dateInfoAsInt[4]);
+                                exam.SetStartDateAndTime(dateArray, dateInfoAsInt[5], dateInfoAsInt[6]);
+                                exam.setDuration(dateInfoAsInt[7]);
+
                                 exam.SetPoint(Integer.parseInt(examInfo[3]));
                                 boolean willAddLesson = true;
-                                for (Exam ex : c.GetExamList()) {
-                                    if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())) {
+                                for (Exam ex : c.getExamList()) {
+                                    if (exam.getLocalDateTime().isEqual(ex.getLocalDateTime())) {
                                         willAddLesson = false;
                                     }
                                 }
                                 if (willAddLesson) {
                                     //Since database importing should not print out anything I use this method insted of course.AddExam()
-                                    c.GetExamList().add(exam);
+                                    c.getExamList().add(exam);
                                 }
 
                                 BufferedReader questionReader = new BufferedReader(new FileReader(c.getName() + "_" + examInfo[0] + "_QnA_List.txt"));

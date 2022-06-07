@@ -1,7 +1,9 @@
 
 import java.io.*;
 import java.time.DateTimeException;
+import java.time.Period;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -94,12 +96,16 @@ public class Main {
                                         int examIndex = scan.nextInt();
                                         scan.nextLine();
                                         try {
-                                            Exam exam = course.GetExam(examIndex - 1);
+                                            Exam exam = course.getExam(examIndex - 1);
                                             if (!exam.isPastDue()){
-                                                exam.Take(student);
+                                                if (!exam.isEarly()){
+                                                    exam.Take(student,course);
+                                                }
+                                                else{
+                                                    TextColours.writeYellow("Exam is not available yet");
+                                                }
                                             }
-                                            else System.out.println("This exam is past due." +
-                                                    "");
+                                            else TextColours.writeYellow("This exam is past due.");
                                         } catch (IndexOutOfBoundsException IOOBE) {
                                             System.out.println("There is no exam in the given index");
                                         }
@@ -127,11 +133,14 @@ public class Main {
                                     int examIndex = scan.nextInt();
                                     scan.nextLine();
                                     try {
-                                        Exam exam = course.GetExam(examIndex - 1);
+                                        Exam exam = course.getExam(examIndex - 1);
                                         try{
                                             StudentSheet sheet = exam.FindStudentSheet(student);
                                             if (sheet.isApproved()){
                                                 System.out.println("Your grade: " + sheet.getGrade());
+                                            }
+                                            else{
+                                                System.out.println("Your grade is not approved yet.");
                                             }
                                         }catch (NullPointerException NPE){
                                             TextColours.writeYellow("System does not contain any data regarding to this exam of yours in this course. If you think there is a problem, please contact with your instructor.");
@@ -549,7 +558,7 @@ public class Main {
                     course.AddExam(exam);
 
                     exam.SetPoint(examPointTotal);
-                    FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.GetID() + "_QnA_List.txt", true);
+                    FileWriter QnA_Writer = new FileWriter(courseName + "_" + exam.getID() + "_QnA_List.txt", true);
                     for (String QnA_Data : storingExam_QnA_Data) {
                         QnA_Writer.write(QnA_Data + System.getProperty("line.separator"));
                     }
@@ -708,7 +717,7 @@ public class Main {
                     int hour;
                     int minute;
                     while (true) {
-                        System.out.print("Please enter the time of the exam: ");
+                        System.out.print("Please enter the start time of the exam: ");
                         String time = scan.nextLine();
                         String[] splitTime = time.split(":");
 
@@ -721,8 +730,51 @@ public class Main {
                         }
                     }
 
+                    int hourEnd;
+                    int minuteEnd;
+                    while (true) {
+                        System.out.print("Please enter the end time of the exam: ");
+                        String time = scan.nextLine();
+                        String[] splitTime = time.split(":");
 
-                    exam.SetDateAndTime(dateParts, hour, minute);
+                        if (splitTime.length == 2) {
+                            hourEnd = Integer.parseInt(splitTime[0]);
+                            minuteEnd = Integer.parseInt(splitTime[1]);
+                            break;
+                        } else {
+                            TextColours.writeYellow("Please enter the time in a valid format (HH:MM)");
+                        }
+                    }
+
+                    /*int duration;
+                    while (true) {
+                        System.out.print("Please enter the duration of the exam in minutes: ");
+                        try {
+                            duration = scan.nextInt();
+                            break;
+                        }
+                        catch (InputMismatchException IME){
+                            TextColours.writeYellow("Please enter an integer.");
+                        }
+                        finally {
+                            scan.nextLine();
+                        }
+                    }*/
+
+
+
+                    exam.SetStartDateAndTime(dateParts, hour, minute);
+                    exam.SetEndDateAndTime(dateParts, hourEnd, minuteEnd);
+
+                    var start = exam.getStartDateAndTime();
+                    var end = exam.getEndDateAndTime();
+
+                    if (start.isAfter(end)){
+                        System.out.println("Start date/time is after end date/time. Please try again.");
+                        continue;
+                    }
+                    int dur = (end.getHour()-start.getHour())*60+end.getMinute()-start.getMinute();
+                    exam.setDuration(dur);
                     break;
                 }
             } catch (DateTimeException DTE) {
@@ -846,7 +898,7 @@ public class Main {
 
         exam.SetPoint(100);
         exam.EditType("Midterm");
-        exam.SetDateAndTime(new int[]{6, 6, 2022}, 10, 50);
+        exam.SetEndDateAndTime(new int[]{6, 6, 2022}, 10, 50);
 
 
         //MATH 101
@@ -857,7 +909,7 @@ public class Main {
 
         exam2.SetPoint(40);
         exam2.EditType("Midterm");
-        exam2.SetDateAndTime(new int[]{5, 4, 2022}, 15, 20);
+        exam2.SetEndDateAndTime(new int[]{5, 4, 2022}, 15, 20);
 
         return new Exam[]{exam, exam2};
         /*Database db = Database.getInstance();

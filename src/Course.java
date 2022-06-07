@@ -19,7 +19,7 @@ public class Course {
         this.name = name;
     }
 
-    public Instructor GetFirstInstructor() {
+    public Instructor getFirstInstructor() {
         return instructors.get(0);
     }
 
@@ -32,19 +32,22 @@ public class Course {
         FileWriter examWriter = new FileWriter(name + "_ExamsList.txt", true);
         boolean willAddExam = true;
         for (Exam ex : examList) {
-            if (exam.GetLocalDateTime().isEqual(ex.GetLocalDateTime())) {
+            if (exam.getLocalDateTime().isEqual(ex.getLocalDateTime())) {
                 willAddExam = false;
             }
         }
 
         if (willAddExam) {
-            examWriter.write(exam.GetID() + "," + exam.GetType() + "," + exam.GetStoringDate() + "," + exam.GetPoint() + System.getProperty("line.separator"));
+            examWriter.write(exam.getID() + "," + exam.getType() + "," + exam.getStoringDate() + "," + exam.getPoint() + System.getProperty("line.separator"));
             examList.add(exam);
 
             //Exam's question and answer storing file is created here
-            File exam_QnA_List = new File(name + "_" + exam.GetID() + "_QnA_List.txt");
+            File exam_QnA_List = new File(name + "_" + exam.getID() + "_QnA_List.txt");
+            exam_QnA_List.createNewFile();
 
-            System.out.println(exam_QnA_List.createNewFile());
+            File exam_student_List = new File(name + "_" + exam.getID() + "_StudentList.txt");
+            exam_student_List.createNewFile();
+
         }
         else{
             throw new ExamCannotBeAddedException();
@@ -53,11 +56,11 @@ public class Course {
     }
 
 
-    public Exam GetExam(int index) {
+    public Exam getExam(int index) {
         return examList.get(index);
     }
 
-    public ArrayList<Exam> GetExamList() {
+    public ArrayList<Exam> getExamList() {
         return examList;
     }
 
@@ -101,9 +104,12 @@ public class Course {
         Exam e = examList.get(i);
         System.out.println("Lesson name: " + name);
         System.out.println("EXAM " + (i + 1));
-        System.out.println("Exam type: " + e.GetType());
-        System.out.println("Date: " + e.GetLongDate());
-        System.out.println("Time: " + e.GetTime());
+        System.out.println("Exam type: " + e.getType());
+        System.out.println("Date: " + e.getLongDate());
+        System.out.println("Start Time: " + e.getStartTime());
+        System.out.println("End Time: " + e.getEndTime());
+        System.out.println("Duration: " + e.getDuration() +" minutes");
+
 
         System.out.println();
     }
