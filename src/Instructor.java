@@ -1,6 +1,4 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class Instructor extends User {
@@ -255,13 +253,32 @@ public class Instructor extends User {
                             case 1 -> {
                                 System.out.println("What is the new type?");
                                 //1 subtracted here to get the desired index
-                                course.getExam(editedExamIndex - 1).EditType(scan.nextLine());
+                                Exam exam = course.getExam(editedExamIndex - 1);
+                                exam.EditType(scan.nextLine());
+
+                                FileWriter examWriter = new FileWriter(course.getName() + "_ExamsList.txt");
+
+                                for (int i = 0; i < course.getExamList().size(); i++) {
+                                    examWriter.write(course.getExamList().get(i).getID() + "," + course.getExamList().get(i).getType() + "," +
+                                            course.getExamList().get(i).getStoringDate() + "," + course.getExamList().get(i).getPoint() + System.getProperty("line.separator"));
+                                }
+                                examWriter.close();
+
+
                             }
 
                             case 2 -> {
                                 System.out.println("What is the new date?");
                                 //1 subtracted here to get the desired index
                                 Main.SetDate(course.getExam(editedExamIndex - 1));
+
+                                FileWriter examWriter = new FileWriter(course.getName() + "_ExamsList.txt");
+
+                                for (int i = 0; i < course.getExamList().size(); i++) {
+                                    examWriter.write(course.getExamList().get(i).getID() + "," + course.getExamList().get(i).getType() + "," +
+                                            course.getExamList().get(i).getStoringDate() + "," + course.getExamList().get(i).getPoint() + System.getProperty("line.separator"));
+                                }
+                                examWriter.close();
                             }
                             default -> System.out.println("Cancelling...");
                         }
@@ -276,7 +293,7 @@ public class Instructor extends User {
     }
 
 
-    public void GradeUnevaluatedQuestions(String courseName, int examIndex) {
+    public void GradeUnevaluatedQuestions(String courseName, int examIndex) throws IOException {
         List<QuestionAndAnswer> QnA_List = null;
         ArrayList<StudentSheet> sheets = null;
         Exam exam = null;
@@ -296,18 +313,20 @@ public class Instructor extends User {
 
         }
 
+        ArrayList<String> sheetWriterHelper = new ArrayList<>();
         if (QnA_List != null && sheets != null) {
             Scanner scan = new Scanner(System.in);
 
-            if(exam.isEarly()){
+            if (exam.isEarly()) {
                 TextColours.writeBlue("Exam is not available for students yet.");
-            }
-            else if (!exam.AreAllSheetsApproved()) {
+            } else if (!exam.AreAllSheetsApproved()) {
 
                 for (int i = 0; i < sheets.size(); i++) {
                     if (sheets.get(i).isApproved()) continue;
 
                     String studentName = sheets.get(i).getStudent().getName() + " " + sheets.get(i).getStudent().getSurname();
+                    int studentID = sheets.get(i).getStudent().getSchoolID();
+
                     System.out.println(studentName + "'s sheet:\n");
 
                     for (int j = 0; j < QnA_List.size(); j++) {
@@ -317,7 +336,7 @@ public class Instructor extends User {
                                 System.out.println("Question:\n" + QnA_List.get(j).getQuestion());
                                 System.out.println();
 
-                                System.out.println("Correct Answer:\n" + QnA_List.get(j).getAnswer().getRightAnswer());
+                                System.out.println("Correct Answer:\n" + QnA_List.get(j).getAnswer().getCorrectAnswer());
                                 System.out.println();
 
                                 System.out.println("Student Answer:\n" + sheets.get(i).getAnswer(j));
@@ -349,11 +368,22 @@ public class Instructor extends User {
                                 System.out.println();
                                 System.out.println();
                             }
-                        }
-                        catch (IndexOutOfBoundsException IOOBE){
+                        } catch (IndexOutOfBoundsException IOOBE) {
                             TextColours.writePurple("Question is not answered.");
                         }
                     }
+                    for (int j = 0; j < sheets.get(i).getGradeList().size(); j++) {
+                        sheetWriterHelper.add(sheets.get(i).getAnswersList().get(j) + "#" + sheets.get(i).getGradeList().get(j));
+                    }
+
+                    File file = new File(courseName + "_" + exam.getID() + "_" + studentID + "_Sheet.txt");
+
+                    FileWriter sheetWriter = new FileWriter(file);
+
+                    for (String s : sheetWriterHelper) {
+                        sheetWriter.write(s + System.getProperty("line.separator"));
+                    }
+                    sheetWriter.close();
 
                     System.out.println(studentName + "'s sheet got " + sheets.get(i).getGrade());
 
@@ -379,6 +409,31 @@ public class Instructor extends User {
 
                     if (approval == 1) {
                         sheets.get(i).setApproved(true);
+                        File studentList = new File(courseName + "_" + exam.getID() + "_StudentList.txt");
+                        BufferedReader studentReader = new BufferedReader(new FileReader(studentList));
+
+                        //Store old data of students who took the exam
+                        ArrayList<String> studentInfoList = new ArrayList<>();
+                        String studentLine;
+                        while ((studentLine = studentReader.readLine()) != null) {
+                            studentInfoList.add(studentLine);
+                        }
+
+                        //Change the approval data for desired student
+                        for (int j = 0; j < studentInfoList.size(); j++) {
+                            String[] studentInfo = studentInfoList.get(j).split(",");
+                            if (Integer.parseInt(studentInfo[0]) == studentID) {
+                                studentInfo[1] = "a";
+                            }
+                            studentInfoList.set(j, studentInfo[0] + "," + studentInfo[1]);
+                        }
+
+                        //Rewrite new data into the same document
+                        FileWriter approvalWriter = new FileWriter(studentList);
+                        for (String newStudentLine : studentInfoList) {
+                            approvalWriter.write(newStudentLine);
+                        }
+                        approvalWriter.close();
                     } else if (approval == 2) {
                         sheets.get(i).setApproved(false);
                     }
@@ -390,6 +445,7 @@ public class Instructor extends User {
     }
 
     public void ShowExamStatistics(String courseName, int examIndex) {
+        System.out.println("Exam index: " + examIndex);
         ArrayList<StudentSheet> sheets = null;
         List<QuestionAndAnswer> QnA_List = null;
         Exam exam = null;
@@ -397,8 +453,29 @@ public class Instructor extends User {
         try {
             Course course = FindCourse(courseName);
             if (examIndex - 1 <= course.ExamCount() - 1 && examIndex - 1 >= 0) {
-                exam = course.getExam(examIndex - 1);
+                exam = course.getExamList().get(examIndex - 1);
                 sheets = exam.getStudentSheetList();
+                System.out.println("\n\nRESULTS OF " + courseName + " EXAM " + (exam.getID() + 1));
+
+                if (sheets != null && sheets.size()!=0) {
+
+                    int totalPoints = 0;
+                    int[] grades = new int[sheets.get(0).getGradeList().size()];
+                    for (int i = 0; i < sheets.size(); i++) {
+
+                        totalPoints += sheets.get(i).getGrade();
+                        for (int j = 0; j < sheets.get(i).getGradeList().size(); j++) {
+                            grades[j] += sheets.get(i).getGradeList().get(j);
+                        }
+                    }
+                    System.out.println("Average: " + (double) (totalPoints / sheets.size()));
+
+                    for (int i = 0; i < grades.length; i++) {
+                        System.out.println("Question " + (i + 1) + "'s average: " + (double) (grades[i] / sheets.size()));
+                    }
+                }
+
+                else TextColours.writeYellow("Exam is not taken by students yet.");
 
             } else {
                 TextColours.writeYellow("There is no exam by the given index.");
@@ -406,22 +483,6 @@ public class Instructor extends User {
         } catch (CourseNotFoundException e) {
             TextColours.writeYellow("Course not found.");
         }
-        System.out.println("\n\nRESULTS OF " + courseName);
 
-        if (sheets != null) {
-            int totalPoints = 0;
-            int[] grades = new int[sheets.get(0).getGradeList().size()];
-            for (int i = 0; i < sheets.size(); i++) {
-                totalPoints += sheets.get(i).getGrade();
-                for (int j = 0; j < sheets.get(i).getGradeList().size(); j++) {
-                    grades[j] += sheets.get(i).getGradeList().get(j);
-                }
-            }
-            System.out.println("Average: " + (double)(totalPoints / sheets.size()));
-
-            for (int i = 0; i < grades.length; i++) {
-                System.out.println("Question " + (i+1) + "'s average: " + (double)(grades[i] / sheets.size()));
-            }
-        }
     }
 }

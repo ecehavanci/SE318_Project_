@@ -117,6 +117,9 @@ public class Exam {
         QnA_List.add(QnA);
     }
 
+    public void AddStudentSheet(StudentSheet sheet){
+        studentSheetList.add(sheet);
+    }
 
     public void PrintQuestions() {
         for (QuestionAndAnswer QnA : QnA_List) {
@@ -216,7 +219,7 @@ public class Exam {
                 File file2 = new File(course.getName() + "_" + getID() + "_StudentList.txt");
                 FileWriter studentWriter = new FileWriter(file2, true);
 
-                studentWriter.write(student.getSchoolID() + System.getProperty("line.separator"));
+                studentWriter.write(student.getSchoolID() + ",u" + System.getProperty("line.separator")); //"n" stands for "unapproved"
 
                 studentWriter.close();
 
@@ -251,13 +254,13 @@ public class Exam {
                 continue;
             }
 
-            System.out.println("Right Answer:\n" + QnA_List.get(i).getAnswer().getRightAnswer());
+            System.out.println("Right Answer:\n" + QnA_List.get(i).getAnswer().getCorrectAnswer());
             System.out.println();
 
             System.out.println("Your Answer:\n" + sheet.getAnswer(i));
             System.out.println();
 
-            if (Objects.equals(sheet.getAnswer(i), QnA_List.get(i).getAnswer().getRightAnswer())) {
+            if (Objects.equals(sheet.getAnswer(i), QnA_List.get(i).getAnswer().getCorrectAnswer())) {
                 sheet.addToGrade(QnA_List.get(i).getPoint());
                 sheet.getGradeList().add(QnA_List.get(i).getPoint());
             } else {

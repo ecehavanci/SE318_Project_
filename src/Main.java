@@ -1,9 +1,7 @@
 
 import java.io.*;
 import java.time.DateTimeException;
-import java.time.Period;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -396,10 +394,6 @@ public class Main {
                     //Text based question is stored temporarily: t stands for "text based"
                     //Storing mechanism is as follows: questionType@question@answer@point
                     storingExam_QnA_Data.add("t@" + questionText + "@" + answerText + "@" + point);
-                    System.out.println(point);
-
-
-
                 }
                 case 2 -> {
                     //Question to be stored:
@@ -451,8 +445,9 @@ public class Main {
                         //Choices are added one by one with their status (if they are right or wrong answer)
                         mca.addChoice(new Choice(choiceList.get(i), (int) choiceCode == 65 + i));
                     }
+                    mca.setCorrectAnswer(mca.returnRightAnswer());
                     //this is for storing right answer as String to help grading
-                    mca.setRightAnswer(Character.toString(choiceCode));
+                    mca.setCorrectAnswer(Character.toString(choiceCode));
 
                     int point;
                     while (true) {
@@ -482,7 +477,6 @@ public class Main {
                             allChoices = allChoices.concat("?" + choice);
                         }
                     }
-                    System.out.println(point);
                     storingExam_QnA_Data.add("m@" + questionText + "@" + allChoices + "@" + mca.getCorrectAnswer() + "@" + point);
 
                 }
@@ -526,10 +520,6 @@ public class Main {
                     //Text based question is stored temporarily: f stands for "true false"
                     //Storing mechanism is as follows: questionType@correctAnswer@point
                     storingExam_QnA_Data.add("f@" + questionText + "@" + tfa.getCorrectAnswer() + "@" + point);
-
-                    System.out.println(point);
-
-
                 }
 
                 case 4 -> isDone = true;
@@ -867,7 +857,7 @@ public class Main {
         Exam exam = new Exam();
         String textBasedQuestion1 = "Write human classification in terms of Linnaean Taxonomy.";
         Answer textBasedAnswer1 = new TextBasedAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
-        textBasedAnswer1.setRightAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
+        textBasedAnswer1.setCorrectAnswer("Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens");
         exam.AddQuestion(textBasedQuestion1, textBasedAnswer1, 30, false);
 
         String trueFalseQuestion1 = "Mushrooms are classified as plants.";
@@ -888,7 +878,7 @@ public class Main {
         multipleChoiceAnswer1.addChoice(new Choice("Homo rufoldensis", false));
         multipleChoiceAnswer1.addChoice(new Choice("Homo neanderthalensis", true));
         multipleChoiceAnswer1.addChoice(new Choice("Homo rhodesiensis", false));
-        multipleChoiceAnswer1.setRightAnswer("C");
+        multipleChoiceAnswer1.setCorrectAnswer("C");
 
         exam.AddQuestion(multipleChoiceQuestion1, multipleChoiceAnswer1, 10, true);
 

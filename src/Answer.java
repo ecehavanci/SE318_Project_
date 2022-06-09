@@ -16,11 +16,11 @@ public abstract class Answer {
         return correctAnswer;
     }
 
-    public String getRightAnswer() {
+    /*public String getRightAnswer() {
         return correctAnswer;
-    }
+    }*/
 
-    public void setRightAnswer(String correctAnswer) {
+    public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
     }
 }
@@ -72,11 +72,11 @@ class MultipleChoiceAnswer extends Answer {
 
     //Only right choice will be printed
     public void printResult() {
-        System.out.println("Right Choice: " + returnRightAnswer());
+        System.out.println("Right Choice: " + correctAnswer);
     }
 
 
-    private String returnRightAnswer(){
+    public String returnRightAnswer(){
         for (Choice c : choices) {
             if (c.isRight) return c.text;
         }

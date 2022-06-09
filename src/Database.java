@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,7 +156,7 @@ public class Database {
         //We have a storing system using text files, import function loads the data in text files into corresponding places in system
 
         //First users are loaded into system with their data
-        File userListFile  = new File("UserList.txt");
+        File userListFile = new File("UserList.txt");
         BufferedReader userReader = new BufferedReader(new FileReader("UserList.txt"));
         String data;
         while ((data = userReader.readLine()) != null) {
@@ -215,17 +216,18 @@ public class Database {
                                 exam.setDuration(dateInfoAsInt[7]);
 
                                 exam.SetPoint(Integer.parseInt(examInfo[3]));
-                                boolean willAddLesson = true;
+                                boolean willAddExam = true;
                                 for (Exam ex : c.getExamList()) {
                                     if (exam.getLocalDateTime().isEqual(ex.getLocalDateTime())) {
-                                        willAddLesson = false;
+                                        willAddExam = false;
                                     }
                                 }
-                                if (willAddLesson) {
-                                    //Since database importing should not print out anything I use this method insted of course.AddExam()
+                                if (willAddExam) {
+                                    //Since database importing should not print out anything I use this method instead of course.AddExam()
                                     c.getExamList().add(exam);
                                 }
 
+                                //Loading questions and answers to system
                                 BufferedReader questionReader = new BufferedReader(new FileReader(c.getName() + "_" + examInfo[0] + "_QnA_List.txt"));
                                 String questionLine;
                                 while ((questionLine = questionReader.readLine()) != null) {
@@ -241,16 +243,13 @@ public class Database {
                                         for (int i = 0; i < choiceArr.length; i++) {
                                             ma.addChoice(new Choice(choiceArr[i], 65 + i == (int) questionInfo[3].charAt(0)));
                                         }
+                                        ma.setCorrectAnswer(questionInfo[3]);
                                         exam.AddQuestion(questionInfo[1], ma, Integer.parseInt(questionInfo[4]), true);
                                     } else if (questionInfo[0].equals("f")) {//If it is a true/false question
                                         TrueFalseAnswer fa = new TrueFalseAnswer(questionInfo[2].charAt(0));
                                         exam.AddQuestion(questionInfo[1], fa, Integer.parseInt(questionInfo[3]), true);
                                     }
                                 }
-
-                                //exam.AddQuestion();
-
-                                //exam.AddQuestion();
 
 
                             }
@@ -294,6 +293,36 @@ public class Database {
                 TextColours.writeRed("Problem with database importing!!!!!");
                 break;
             }
+        }
+
+        //Loading students' sheets to system
+        for (Course c : courseList){
+            for (Exam e : c.getExamList()){
+                BufferedReader examStudentListReader = new BufferedReader(new FileReader(c.getName() + "_" + e.getID() + "_StudentList.txt"));
+                String studentLine;
+                while ((studentLine = examStudentListReader.readLine()) != null) {
+                    String[] studentInfo = studentLine.split(",");
+
+                    BufferedReader sheetReader = new BufferedReader(new FileReader(c.getName() + "_" + e.getID() + "_" + studentInfo[0] + "_Sheet.txt"));
+                    String sheetLine;
+
+                    ArrayList <String> answers = new ArrayList<>();
+                    ArrayList <Integer> points = new ArrayList<>();
+
+                    int totalPoint=0;
+                    while ((sheetLine = sheetReader.readLine()) != null) {
+                        String[] sheetInfo = sheetLine.split("#");
+                        answers.add(sheetInfo[0]);
+                        points.add(Integer.parseInt(sheetInfo[1]));
+                        totalPoint+=Integer.parseInt(sheetInfo[1])==-1?0:Integer.parseInt(sheetInfo[1]);
+                    }
+                    StudentSheet sheet = new StudentSheet((Student)FindUser(Integer.parseInt(studentInfo[0])),answers,points);
+                    sheet.setApproved(studentInfo[1].equals("a"));
+                    e.AddStudentSheet(sheet);
+                    sheet.setGrade(totalPoint);
+                }
+            }
+
         }
     }
 

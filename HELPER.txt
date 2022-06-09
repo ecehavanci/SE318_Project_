@@ -32,7 +32,10 @@ Their questions are stored in their relative name_examIndex_QnA_List.txt in 3 wa
 
 STORING SHEETS:
 Sheets are stored in their relative courseName_examID_studentSchoolID()_Sheet.txt
-They are stored in the following manner
+They are stored in the following manner: answer#point
+
+Student ID's who took the exam is stored in the relative courseName_examID_StudentList.txt
+
 
 
 
