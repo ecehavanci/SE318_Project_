@@ -170,7 +170,8 @@ public class Exam {
                     if (QnA.getAnswer() instanceof MultipleChoiceAnswer) {
                         if (studentAnswer.toCharArray().length > 1) {
                             TextColours.writeYellow("Please enter the word symbol of the choice(A, B, C, etc.).");
-                            return;
+                            System.out.print("Answer: ");
+                            studentAnswer = scan.nextLine();
                         }
 
                         MultipleChoiceAnswer mca = (MultipleChoiceAnswer) QnA.getAnswer();

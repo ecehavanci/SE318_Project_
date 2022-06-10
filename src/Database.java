@@ -224,7 +224,7 @@ public class Database {
                                 }
                                 if (willAddExam) {
                                     //Since database importing should not print out anything I use this method instead of course.AddExam()
-                                    c.getExamList().add(exam);
+                                    c.AddExam(exam);
                                 }
 
                                 //Loading questions and answers to system
@@ -256,6 +256,8 @@ public class Database {
 
                         } catch (CourseAlreadyExistsException e) {
                             //No problem even such an error is occurred, in this method we expect no output, no warning, etc.
+                        } catch (ExamCannotBeAddedException e) {
+                            e.printStackTrace();
                         }
                     }
                     courseReader.close();

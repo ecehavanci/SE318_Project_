@@ -431,7 +431,7 @@ public class Instructor extends User {
                         //Rewrite new data into the same document
                         FileWriter approvalWriter = new FileWriter(studentList);
                         for (String newStudentLine : studentInfoList) {
-                            approvalWriter.write(newStudentLine);
+                            approvalWriter.write(newStudentLine + System.getProperty("line.separator"));
                         }
                         approvalWriter.close();
                     } else if (approval == 2) {
