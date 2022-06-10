@@ -471,7 +471,7 @@ public class Instructor extends User {
                     System.out.println("Average: " + (double) (totalPoints / sheets.size()));
 
                     for (int i = 0; i < grades.length; i++) {
-                        System.out.println("Question " + (i + 1) + "'s average: " + (double) (grades[i] / sheets.size()));
+                        System.out.println("Question " + (i + 1) + "'s average: " +  ((double)grades[i] / (double)sheets.size()));
                     }
                 }
 

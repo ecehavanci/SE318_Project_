@@ -1,0 +1,4 @@
+instructor,1,1,Jonh,Roseland
+student,2,2,Alice,King
+student,3,3,Gerard,Greene
+student,4,4,Cheryll,Basket

@@ -1,0 +1,7 @@
+t@Write human classification in terms of Linnaean Taxonomy.@Animalia -> Cordata -> Mammalia -> Piramates -> Homminidae -> Homo -> Homo Sapiens@30
+f@Mushrooms are classified as plants.@F@5
+f@Mammals are known for laying eggs.@F@5
+f@Humans and dinosaurs never lived in the same era.@T@5
+m@Which human species did homo sapiens lived together with?@Homo habilis?Homo rufoldensis?Homo neanderthalensis?Homo rhodesiensis@C@10
+m@Which bird species did Darwin inspect for evolution?@Finch?Sparrow?Falcon@A@10
+t@Summarize Lamarckian Eveolution in 2-3 sentences and give an example.@null@35
